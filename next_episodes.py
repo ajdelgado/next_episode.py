@@ -80,7 +80,7 @@ def GetArguments():
 	output = None
 	verbose = False
 	for o, a in opts:
-		if o == "-v":
+		if o in ("-d","--debug":
 			DEBUG=DEBUG+1
 		elif o in ("-h", "--help"):
 			Usage()
