@@ -58,18 +58,21 @@ def CheckIfRunning():
 			except psutil.NoSuchProcess:
 				Nothing=0
 def Usage():
-	print "-u | --user=<USER>			User name for Transmission remote. Optional."
-	print "-p | --password=<PASSWORD>	Password for Transmission remote. Optional."
-	print "-s | --server=<SERVER>		Server for Transmission remote. Default: localhost."
-	print "-P | --port=<PORT>			Port for Transmission remote. Default: 9091."
-	print "-x | --proxy=<PROXY>			Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
-	print "-d | --debug					Verbose output, repeat it to increase verbosity."
-	print "-h | --help					Show this help."
+	global LOGFILE
+	print "-u | --user=<USER>						User name for Transmission remote. Optional."
+	print "-p | --password=<PASSWORD>				Password for Transmission remote. Optional."
+	print "-s | --server=<SERVER>					Server for Transmission remote. Default: localhost."
+	print "-P | --port=<PORT>						Port for Transmission remote. Default: 9091."
+	print "-x | --proxy=<PROXY>						Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
+	print "-a | --user-agent=<USER-AGENT-STRING>	User-agent string to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
+	print "-l | --logfile=<LOG FILE>				Log file to record debug information. Default: %s" % LOGFILE
+	print "-d | --debug								Verbose output, repeat it to increase verbosity."
+	print "-h | --help								Show this help."
 def GetArguments():
 	import getopt
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "help"])
+		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "help"])
 	except getopt.GetoptError as err:
 		print str(err)
 		Usage()
@@ -82,6 +85,12 @@ def GetArguments():
 		elif o in ("-h", "--help"):
 			Usage()
 			sys.exit(0)
+		elif o in ("-a", "--user-agent"):
+			Message("User agent for HTTP requests will be %s." % a)
+			USER_AGENT=a
+		elif o in ("-l", "--logfile"):
+			Message("Log will be saved in '%s'." % a)
+			LOGFILE=a
 		elif o in ("-u", "--user"):
 			Message("User name for Transmission remote will be %s." % a)
 			TRANSMISSIONUSER=a
