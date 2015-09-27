@@ -122,7 +122,7 @@ def LoadConfigFile(FILE):
 		sys.exit(65)
 	else:
 		configfile=open(FILE,"r")
-		content=configfile.read()
+		content=configfile.readlines()
 		configfile.close()
 		for line in content:
 			lcomment=line.split("#")
