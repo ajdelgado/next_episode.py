@@ -26,8 +26,7 @@ TRANSMISSIONPORT=9091
 os.environ['http_proxy']=PROXY
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
-#EXCEPTIONS={"Person.of.Interest", "Arrow", "Better.Call.Saul","The.Knick","Star.Wars.The.Clone.Wars", "True.Blood","Green.Wing","Vikings","Community", "Black.Mirror", "The.Americans", "An.Idiot.Abroad", "Dexter", "Futurama", "Breaking.Bad", "Californication", "Spartacus","Dominion.Tank.Police","BAND.OF.BROTHERS","House","Chuck","How.I.Met.Your.Mother","Mythbuster","Planet.Earth","The.Twilight.Zone","Yes.Prime.Minister","Doctor.Who","The.Wire"}
-EXCEPTIONS={"True.Detective", "The.Flash", "Sense8", "The.Crazy.Ones", "Hunted", "Halt.and.Catch.Fire","Community","Alphas","Person.of.Interest","BAND.OF.BROTHERS","Arrow","Green.Wing","Black.Mirror","Vikings","Californication","Fargo","Spartacus","Revolution.2012","Dexter","The.Americans","Breaking.Bad","Better.Call.Saul","The.Killing","An.Idiot.Abroad","The.Knick","Utopia","Orange.Is.The.New.Black","Star.Wars.The.Clone.Wars"}
+EXCEPTIONS=list()
 URLBASE="https://kat.ph/usearch"
 def Message(TEXT,NIVEL=0):
 	global DEBUG,LOGFILE
@@ -59,24 +58,25 @@ def CheckIfRunning():
 				Nothing=0
 def Usage():
 	global LOGFILE
-	print "-u | --user=<USER>						User name for Transmission remote. Optional."
-	print "-p | --password=<PASSWORD>				Password for Transmission remote. Optional."
-	print "-s | --server=<SERVER>					Server for Transmission remote. Default: localhost."
-	print "-P | --port=<PORT>						Port for Transmission remote. Default: 9091."
-	print "-x | --proxy=<PROXY>						Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
-	print "-a | --user-agent=<USER-AGENT-STRING>	User-agent string to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
-	print "-l | --logfile=<LOG FILE>				Log file to record debug information. Default: %s" % LOGFILE
-	print "-c | --configfile=<CONFIG FILE>			Config file with the parameters to use."
-	print "-d | --debug								Verbose output, repeat it to increase verbosity."
-	print "-h | --help								Show this help."
+	print "-u | --user=<USER>							User name for Transmission remote. Optional."
+	print "-p | --password=<PASSWORD>					Password for Transmission remote. Optional."
+	print "-s | --server=<SERVER>						Server for Transmission remote. Default: localhost."
+	print "-P | --port=<PORT>							Port for Transmission remote. Default: 9091."
+	print "-x | --proxy=<PROXY>							Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
+	print "-a | --user-agent=<USER-AGENT-STRING>		User-agent string to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
+	print "-l | --logfile=<LOG FILE>					Log file to record debug information. Default: %s" % LOGFILE
+	print "-c | --configfile=<CONFIG FILE>				Config file with the parameters to use."
+	print "-e | --exception=<TV Show folder to ignore>	Config file with the parameters to use."
+	print "-d | --debug									Verbose output, repeat it to increase verbosity."
+	print "-h | --help									Show this help."
 	print ""
 	print "Config file syntax"
 	print " The config file use a basic parameter=value syntax. The parameters are the same that you can use in the command line: user,password,server,port,proxy,debug and logfile."
 def GetArguments():
 	import getopt
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "configfile=", "help"])
+		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:e:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "configfile=", "exception=","help"])
 	except getopt.GetoptError as err:
 		print str(err)
 		Usage()
@@ -109,13 +109,16 @@ def GetArguments():
 		elif o in ("-c", "--configfile"):
 			Message("Reading config gile '%s'." % a)
 			LoadConfigFile(a)
+		elif o in ("-e", "--exceptions"):
+			Message("Adding exception to TV show '%s'." % a)
+			EXCEPTIONS.append(a)
 		elif o in ("-d", "--debug"):
 			DEBUG=DEBUG + 1
 			Message("Increased debug level to %s" % DEBUG)
 		else:
 			assert False, "Unhandled option %s" % o
 def LoadConfigFile(FILE):
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS
 	if not os.path.exists(FILE):
 		Message("The config file '%s' doesn't exist" % FILE)
 		Usage()
@@ -154,6 +157,9 @@ def LoadConfigFile(FILE):
 			elif o in ("x", "proxy"):
 				Message("Proxy for HTTP requests will be '%s'." % a)
 				PROXY=a
+			elif o in ("e", "exceptions"):
+				Message("Adding exception to TV show '%s'." % a)
+				EXCEPTIONS.append(a)
 			elif o in ("d", "debug"):
 				DEBUG=DEBUG + 1
 				Message("Increased debug level to %s" % DEBUG)
