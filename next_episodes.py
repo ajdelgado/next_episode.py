@@ -22,7 +22,7 @@ PROXY=""
 TRANSMISSIONUSER="admin"
 TRANSMISSIONPASS=""
 TRANSMISSIONSERVER="localhost"
-TRANSMISSIONPORT=6884
+TRANSMISSIONPORT=9091
 os.environ['http_proxy']=PROXY
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
@@ -57,12 +57,51 @@ def CheckIfRunning():
 					Message("I can't read information for process %s" % process)
 			except psutil.NoSuchProcess:
 				Nothing=0
+def Usage():
+	print "-u | --user=<USER>			User name for Transmission remote. Optional."
+	print "-p | --password=<PASSWORD>	Password for Transmission remote. Optional."
+	print "-s | --server=<SERVER>		Server for Transmission remote. Default: localhost."
+	print "-P | --port=<PORT>			Port for Transmission remote. Default: 9091."
+	print "-x | --proxy=<PROXY>			Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
+	print "-d | --debug					Verbose output, repeat it to increase verbosity."
+	print "-h | --help					Show this help."
 def GetArguments():
-	global DEBUG
-	for arg in sys.argv:
-		if arg == "-v" or arg == "-d" or arg == "--d" or arg == "--v":
+	import getopt
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "help"])
+	except getopt.GetoptError as err:
+		print str(err)
+		Usage()
+		sys.exit(65)
+	output = None
+	verbose = False
+	for o, a in opts:
+		if o == "-v":
+			DEBUG=DEBUG+1
+		elif o in ("-h", "--help"):
+			Usage()
+			sys.exit(0)
+		elif o in ("-u", "--user"):
+			Message("User name for Transmission remote will be %s." % a)
+			TRANSMISSIONUSER=a
+		elif o in ("-p", "--password"):
+			Message("Password for Transmission set.")
+			TRANSMISSIONPASS=a
+		elif o in ("-s", "--server"):
+			Message("Transmission server will be %s." % a)
+			TRANSMISSIONSERVER=a
+		elif o in ("-P", "--port"):
+			Message("Port for Transmission will be %s." % a)
+			TRANSMISSIONPORT=a
+		elif o in ("-x", "--proxy"):
+			Message("Proxy for HTTP requests will be '%s'." % a)
+			PROXY=a
+		elif o in ("-d", "--debug"):
 			DEBUG=DEBUG + 1
-			Message("III Increasing debuf level to %s" % DEBUG)
+			Message("Increased debug level to %s" % DEBUG)
+		else:
+			assert False, "Unhandled option %s" % o
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
 		return False
