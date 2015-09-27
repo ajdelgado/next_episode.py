@@ -78,7 +78,6 @@ def GetArguments():
 		Usage()
 		sys.exit(65)
 	for o, a in opts:
-		print o,a
 		if o in ("-h", "--help"):
 			Usage()
 			sys.exit(0)
@@ -122,8 +121,11 @@ def RecursiveFileListing(PATH):
 def AddMagnet(URL):
 	import transmissionrpc
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
-	conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
-	conn.add_torrent(URL)
+	try:
+		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
+		conn.add_torrent(URL)
+	except:
+		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%S" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT))
 def LastShowEpisode(SHOW):
 	global PATH
 	FILES=RecursiveFileListing("%s/%s" % (PATH,SHOW))
