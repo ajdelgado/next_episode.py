@@ -18,12 +18,11 @@ PATH="/home/ficheros/videos/series/"
 #PATHTORRENTS="/home/ficheros/torrents/"
 DEBUG=0
 VERSION=0.1
-PROXY=""
+PROXY=os.environ['http_proxy']
 TRANSMISSIONUSER="admin"
 TRANSMISSIONPASS=""
 TRANSMISSIONSERVER="localhost"
 TRANSMISSIONPORT=9091
-os.environ['http_proxy']=PROXY
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
 EXCEPTIONS=list()
@@ -365,7 +364,7 @@ def Checks():
 	return True
 CheckIfRunning()
 GetArguments()
-
+os.environ['http_proxy']=PROXY
 if not Checks():
 	sys.exit(1)
 SHOWS=os.listdir(PATH)
