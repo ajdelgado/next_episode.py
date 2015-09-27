@@ -127,8 +127,8 @@ def LoadConfigFile(FILE):
 		for line in content:
 			lcomment=line.split("#")
 			line=lcomment[0]
-			pair=line.lower().split("=")
-			o=pair[0].strip()
+			pair=line.split("=")
+			o=pair[0].strip().lower()
 			if len(pair)>1:
 				a=pair[1].strip()
 			else:
