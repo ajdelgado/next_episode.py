@@ -18,7 +18,10 @@ PATH="/home/ficheros/videos/series/"
 #PATHTORRENTS="/home/ficheros/torrents/"
 DEBUG=0
 VERSION=0.1
-PROXY=os.environ['http_proxy']
+if 'http_proxy' in os.environ.keys():
+	PROXY=os.environ['http_proxy']
+else:
+	PROXY=""
 TRANSMISSIONUSER="admin"
 TRANSMISSIONPASS=""
 TRANSMISSIONSERVER="localhost"
