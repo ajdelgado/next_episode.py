@@ -123,7 +123,10 @@ def AddMagnet(URL):
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
 	try:
 		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
-		conn.add_torrent(URL)
+		try:
+			conn.add_torrent(URL)
+		except:
+			Message("Error adding torrent URL '%s' to Transmission" % URL)
 	except:
 		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%S" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT))
 def LastShowEpisode(SHOW):
