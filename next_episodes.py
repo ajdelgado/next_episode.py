@@ -106,6 +106,9 @@ def GetArguments():
 		elif o in ("-x", "--proxy"):
 			Message("Proxy for HTTP requests will be '%s'." % a)
 			PROXY=a
+		elif o in ("-c", "--configfile"):
+			Message("Reading config gile '%s'." % a)
+			LoadConfigFile(a)
 		elif o in ("-d", "--debug"):
 			DEBUG=DEBUG + 1
 			Message("Increased debug level to %s" % DEBUG)
