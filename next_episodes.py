@@ -66,8 +66,12 @@ def Usage():
 	print "-x | --proxy=<PROXY>						Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
 	print "-a | --user-agent=<USER-AGENT-STRING>	User-agent string to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
 	print "-l | --logfile=<LOG FILE>				Log file to record debug information. Default: %s" % LOGFILE
+	print "-c | --configfile=<CONFIG FILE>			Config file with the parameters to use."
 	print "-d | --debug								Verbose output, repeat it to increase verbosity."
 	print "-h | --help								Show this help."
+	print ""
+	print "Config file syntax"
+	print " The config file use a basic parameter=value syntax. The parameters are the same that you can use in the command line: user,password,server,port,proxy,debug and logfile."
 def GetArguments():
 	import getopt
 	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE
@@ -107,6 +111,52 @@ def GetArguments():
 			Message("Increased debug level to %s" % DEBUG)
 		else:
 			assert False, "Unhandled option %s" % o
+def LoadConfigFile(FILE):
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE
+	if not os.path.exists(FILE):
+		Message("The config file '%s' doesn't exist" % FILE)
+		Usage()
+		sys.exit(65)
+	else:
+		configfile=open(FILE,"r")
+		content=configfile.read()
+		configfile.close()
+		for line in content:
+			lcomment=split("#",line)
+			line=lcomment[0]
+			pair=split("=",line.lower())
+			o=pair[0].strip()
+			if len(pair)>1:
+				a=pair[1].strip()
+			else
+				a=""
+			print o,a
+			if o in ("a", "useragent"):
+				Message("User agent for HTTP requests will be %s." % a)
+				USER_AGENT=a
+			elif o in ("l", "logfile"):
+				Message("Log will be saved in '%s'." % a)
+				LOGFILE=a
+			elif o in ("u", "user"):
+				Message("User name for Transmission remote will be %s." % a)
+				TRANSMISSIONUSER=a
+			elif o in ("p", "password"):
+				Message("Password for Transmission set.")
+				TRANSMISSIONPASS=a
+			elif o in ("s", "server"):
+				Message("Transmission server will be %s." % a)
+				TRANSMISSIONSERVER=a
+			elif o in ("P", "port"):
+				Message("Port for Transmission will be %s." % a)
+				TRANSMISSIONPORT=a
+			elif o in ("x", "proxy"):
+				Message("Proxy for HTTP requests will be '%s'." % a)
+				PROXY=a
+			elif o in ("d", "debug"):
+				DEBUG=DEBUG + 1
+				Message("Increased debug level to %s" % DEBUG)
+			else:
+				assert False, "Unhandled option %s" % o				
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
 		return False
@@ -127,8 +177,8 @@ def AddMagnet(URL):
 			conn.add_torrent(URL)
 		except:
 			Message("Error adding torrent URL '%s' to Transmission" % URL)
-	except:
-		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT))
+	except e:
+		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT,e))
 def LastShowEpisode(SHOW):
 	global PATH
 	FILES=RecursiveFileListing("%s/%s" % (PATH,SHOW))
