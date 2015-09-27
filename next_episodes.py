@@ -133,7 +133,6 @@ def LoadConfigFile(FILE):
 				a=pair[1].strip()
 			else:
 				a=""
-			print o,a
 			if o in ("a", "useragent"):
 				Message("User agent for HTTP requests will be %s." % a)
 				USER_AGENT=a
@@ -174,14 +173,14 @@ def RecursiveFileListing(PATH):
 def AddMagnet(URL):
 	import transmissionrpc
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
-	try:
-		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
-		try:
-			conn.add_torrent(URL)
-		except:
-			Message("Error adding torrent URL '%s' to Transmission" % URL)
-	except e:
-		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT,e))
+	#try:
+	conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
+	#	try:
+	conn.add_torrent(URL)
+	#	except:
+	#		Message("Error adding torrent URL '%s' to Transmission" % URL)
+	#except e:
+	#	Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT,e))
 def LastShowEpisode(SHOW):
 	global PATH
 	FILES=RecursiveFileListing("%s/%s" % (PATH,SHOW))
