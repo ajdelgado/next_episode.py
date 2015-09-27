@@ -128,7 +128,7 @@ def LoadConfigFile(FILE):
 			o=pair[0].strip()
 			if len(pair)>1:
 				a=pair[1].strip()
-			else
+			else:
 				a=""
 			print o,a
 			if o in ("a", "useragent"):
