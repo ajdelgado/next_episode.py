@@ -27,7 +27,7 @@ os.environ['http_proxy']=PROXY
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
 #EXCEPTIONS={"Person.of.Interest", "Arrow", "Better.Call.Saul","The.Knick","Star.Wars.The.Clone.Wars", "True.Blood","Green.Wing","Vikings","Community", "Black.Mirror", "The.Americans", "An.Idiot.Abroad", "Dexter", "Futurama", "Breaking.Bad", "Californication", "Spartacus","Dominion.Tank.Police","BAND.OF.BROTHERS","House","Chuck","How.I.Met.Your.Mother","Mythbuster","Planet.Earth","The.Twilight.Zone","Yes.Prime.Minister","Doctor.Who","The.Wire"}
-EXCEPTIONS={"The.Flas", "Sense8", "The.Crazy.Ones", "Hunted", "Halt.and.Catch.Fire","Community","Alphas","Person.of.Interest","BAND.OF.BROTHERS","Arrow","Green.Wing","Black.Mirror","Vikings","Californication","Fargo","Spartacus","Revolution.2012","Dexter","The.Americans","Breaking.Bad","Better.Call.Saul","The.Killing","An.Idiot.Abroad","The.Knick","Utopia","Orange.Is.The.New.Black","Star.Wars.The.Clone.Wars"}
+EXCEPTIONS={"True.Detective", "The.Flash", "Sense8", "The.Crazy.Ones", "Hunted", "Halt.and.Catch.Fire","Community","Alphas","Person.of.Interest","BAND.OF.BROTHERS","Arrow","Green.Wing","Black.Mirror","Vikings","Californication","Fargo","Spartacus","Revolution.2012","Dexter","The.Americans","Breaking.Bad","Better.Call.Saul","The.Killing","An.Idiot.Abroad","The.Knick","Utopia","Orange.Is.The.New.Black","Star.Wars.The.Clone.Wars"}
 URLBASE="https://kat.ph/usearch"
 def Message(TEXT,NIVEL=0):
 	global DEBUG,LOGFILE
