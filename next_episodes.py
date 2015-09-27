@@ -128,7 +128,7 @@ def AddMagnet(URL):
 		except:
 			Message("Error adding torrent URL '%s' to Transmission" % URL)
 	except:
-		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%S" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT))
+		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT))
 def LastShowEpisode(SHOW):
 	global PATH
 	FILES=RecursiveFileListing("%s/%s" % (PATH,SHOW))
