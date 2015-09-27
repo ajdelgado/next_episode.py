@@ -125,9 +125,9 @@ def LoadConfigFile(FILE):
 		content=configfile.read()
 		configfile.close()
 		for line in content:
-			lcomment=split("#",line)
+			lcomment=line.split("#")
 			line=lcomment[0]
-			pair=split("=",line.lower())
+			pair=line.lower().split("=")
 			o=pair[0].strip()
 			if len(pair)>1:
 				a=pair[1].strip()
