@@ -77,12 +77,9 @@ def GetArguments():
 		print str(err)
 		Usage()
 		sys.exit(65)
-	output = None
-	verbose = False
 	for o, a in opts:
-		if o in ("-d","--debug":
-			DEBUG=DEBUG+1
-		elif o in ("-h", "--help"):
+		print o,a
+		if o in ("-h", "--help"):
 			Usage()
 			sys.exit(0)
 		elif o in ("-a", "--user-agent"):
