@@ -76,7 +76,7 @@ def GetArguments():
 	import getopt
 	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "help"])
+		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "configfile=", "help"])
 	except getopt.GetoptError as err:
 		print str(err)
 		Usage()
