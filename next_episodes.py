@@ -109,7 +109,7 @@ def GetArguments():
 		elif o in ("-c", "--configfile"):
 			Message("Reading config gile '%s'." % a)
 			LoadConfigFile(a)
-		elif o in ("-e", "--exceptions"):
+		elif o in ("-e", "--exception"):
 			Message("Adding exception to TV show '%s'." % a)
 			EXCEPTIONS.append(a)
 		elif o in ("-d", "--debug"):
@@ -157,7 +157,7 @@ def LoadConfigFile(FILE):
 			elif o in ("x", "proxy"):
 				Message("Proxy for HTTP requests will be '%s'." % a)
 				PROXY=a
-			elif o in ("e", "exceptions"):
+			elif o in ("e", "exception"):
 				Message("Adding exception to TV show '%s'." % a)
 				EXCEPTIONS.append(a)
 			elif o in ("d", "debug"):
