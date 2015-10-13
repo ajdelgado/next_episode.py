@@ -178,6 +178,21 @@ def RecursiveFileListing(PATH):
 		#for FILE in SFILES:
 			#FILES.append(os.path.join(RAIZ,FILE))
 	return FILES
+def CheckTranmission():
+	import transmissionrpc
+	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
+	try:
+		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
+		try:
+			ltorrents=conn.get_torrents()
+		except:
+			Message("Error getting list of torrents from Transmission")
+			return False
+	except transmissionrpc.error.TransmissionError,e:
+		Message("Error connecting to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT,e))
+		return False
+	Message("Successfully connected to transmission (obtained %s torrents)" % len(ltorrents))
+	return True
 def AddMagnet(URL):
 	import transmissionrpc
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
@@ -364,6 +379,8 @@ def Checks():
 	#if not os.path.exists(PATHTORRENTS):
 		#Message("La ruta '%s' no existe, saliendo." % PATHTORRENTS,1)
 		#return False
+	if not CheckTranmission():
+		return False
 	return True
 CheckIfRunning()
 GetArguments()
