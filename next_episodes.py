@@ -180,6 +180,9 @@ def RecursiveFileListing(PATH):
 	return FILES
 def CheckTranmission():
 	import transmissionrpc
+	result=True
+	current_proxy=os.environ['http_proxy']
+	os.environ['http_proxy']=""
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
 	try:
 		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
@@ -187,12 +190,13 @@ def CheckTranmission():
 			ltorrents=conn.get_torrents()
 		except:
 			Message("Error getting list of torrents from Transmission")
-			return False
+			result=False
 	except transmissionrpc.error.TransmissionError,e:
 		Message("Error connecting to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (TRANSMISSIONUSER,TRANSMISSIONSERVER,TRANSMISSIONPORT,e))
-		return False
+		result=False
 	Message("Successfully connected to transmission (obtained %s torrents)" % len(ltorrents))
-	return True
+	os.environ['http_proxy']=current_proxy
+	return result
 def AddMagnet(URL):
 	import transmissionrpc
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
