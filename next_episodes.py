@@ -26,6 +26,7 @@ TRANSMISSIONUSER="admin"
 TRANSMISSIONPASS=""
 TRANSMISSIONSERVER="localhost"
 TRANSMISSIONPORT=9091
+TRANSMISSIONPROXY=os.environ['http_proxy']
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
 EXCEPTIONS=list()
@@ -69,6 +70,7 @@ def Usage():
 	print "-l | --logfile=<LOG FILE>					Log file to record debug information. Default: %s" % LOGFILE
 	print "-c | --configfile=<CONFIG FILE>				Config file with the parameters to use."
 	print "-e | --exception=<TV Show folder to ignore>	Config file with the parameters to use."
+	print "-t | --transmission-proxy=<PROXY URL>		Proxy URL to be used by Transmission. Default is the environmental variable http_proxy."
 	print "-d | --debug									Verbose output, repeat it to increase verbosity."
 	print "-h | --help									Show this help."
 	print ""
@@ -76,9 +78,9 @@ def Usage():
 	print " The config file use a basic parameter=value syntax. The parameters are the same that you can use in the command line: user,password,server,port,proxy,debug and logfile."
 def GetArguments():
 	import getopt
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:e:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "configfile=", "exception=","help"])
+		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:e:t:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "configfile=", "exception=","transmission-proxy=","help"])
 	except getopt.GetoptError as err:
 		print str(err)
 		Usage()
@@ -111,6 +113,9 @@ def GetArguments():
 		elif o in ("-c", "--configfile"):
 			Message("Reading config gile '%s'." % a)
 			LoadConfigFile(a)
+		elif o in ("-t", "--transmission-proxy"):
+			Message("Using %s as proxy URL to communicate with transmission." % a)
+			TRANSMISSIONPROXY=a
 		elif o in ("-e", "--exception"):
 			Message("Adding exception to TV show '%s'." % a)
 			EXCEPTIONS.append(a)
@@ -120,7 +125,7 @@ def GetArguments():
 		else:
 			assert False, "Unhandled option %s" % o
 def LoadConfigFile(FILE):
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY
 	if not os.path.exists(FILE):
 		Message("The config file '%s' doesn't exist" % FILE)
 		Usage()
@@ -159,6 +164,9 @@ def LoadConfigFile(FILE):
 			elif o in ("x", "proxy"):
 				Message("Proxy for HTTP requests will be '%s'." % a)
 				PROXY=a
+			elif o in ("t", "transmission-proxy"):
+				Message("Using %s as proxy URL to communicate with transmission." % a)
+				TRANSMISSIONPROXY=a
 			elif o in ("e", "exception"):
 				Message("Adding exception to TV show '%s'." % a)
 				EXCEPTIONS.append(a)
@@ -180,10 +188,10 @@ def RecursiveFileListing(PATH):
 	return FILES
 def CheckTranmission():
 	import transmissionrpc
+	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT,TRANSMISSIONPROXY
 	result=True
 	current_proxy=os.environ['http_proxy']
-	os.environ['http_proxy']=""
-	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
+	os.environ['http_proxy']=TRANSMISSIONPROXY
 	try:
 		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
 		try:
@@ -199,9 +207,9 @@ def CheckTranmission():
 	return result
 def AddMagnet(URL):
 	import transmissionrpc
-	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT
+	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT,TRANSMISSIONPROXY
 	current_proxy=os.environ['http_proxy']
-	os.environ['http_proxy']=""
+	os.environ['http_proxy']=TRANSMISSIONPROXY
 	try:
 		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
 		try:
