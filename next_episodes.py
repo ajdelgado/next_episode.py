@@ -114,7 +114,7 @@ def GetArguments():
 			Message("Reading config gile '%s'." % a)
 			LoadConfigFile(a)
 		elif o in ("-t", "--transmission-proxy"):
-			Message("Using %s as proxy URL to communicate with transmission." % a)
+			Message("Using '%s' as proxy URL to communicate with transmission." % a)
 			TRANSMISSIONPROXY=a
 		elif o in ("-e", "--exception"):
 			Message("Adding exception to TV show '%s'." % a)
@@ -165,7 +165,7 @@ def LoadConfigFile(FILE):
 				Message("Proxy for HTTP requests will be '%s'." % a)
 				PROXY=a
 			elif o in ("t", "transmission-proxy"):
-				Message("Using %s as proxy URL to communicate with transmission." % a)
+				Message("Using '%s' as proxy URL to communicate with transmission." % a)
 				TRANSMISSIONPROXY=a
 			elif o in ("e", "exception"):
 				Message("Adding exception to TV show '%s'." % a)
