@@ -26,7 +26,11 @@ TRANSMISSIONUSER="admin"
 TRANSMISSIONPASS=""
 TRANSMISSIONSERVER="localhost"
 TRANSMISSIONPORT=9091
-TRANSMISSIONPROXY=os.environ['http_proxy']
+if 'http_proxy' in os.environ.keys():
+	TRANSMISSIONPROXY=os.environ['http_proxy']
+else
+	TRANSMISSIONPROXY=""
+fi
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
 EXCEPTIONS=list()
@@ -190,7 +194,10 @@ def CheckTranmission():
 	import transmissionrpc
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT,TRANSMISSIONPROXY
 	result=True
-	current_proxy=os.environ['http_proxy']
+	if 'http_proxy' in os.environ.keys():
+		current_proxy=os.environ['http_proxy']
+	else:
+		current_proxy=""
 	os.environ['http_proxy']=TRANSMISSIONPROXY
 	try:
 		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
@@ -208,7 +215,10 @@ def CheckTranmission():
 def AddMagnet(URL):
 	import transmissionrpc
 	global TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONSERVER,TRANSMISSIONPORT,TRANSMISSIONPROXY
-	current_proxy=os.environ['http_proxy']
+	if 'http_proxy' in os.environ.keys():
+		current_proxy=os.environ['http_proxy']
+	else:
+		current_proxy=""
 	os.environ['http_proxy']=TRANSMISSIONPROXY
 	try:
 		conn=transmissionrpc.Client(TRANSMISSIONSERVER, user=TRANSMISSIONUSER,password=TRANSMISSIONPASS,port=TRANSMISSIONPORT)
@@ -306,7 +316,10 @@ def GetURLContent(URL):
 	import gc,random,urllib2,zipfile,socket,httplib,magic,gzip,cookielib
 	gc.collect()
 	try:
-		PROXY=os.environ["http_proxy"]
+		if 'http_proxy' in os.environ.keys():
+			PROXY=os.environ["http_proxy"]
+		else:
+			PROXY=""
 	except:
 		PROXY=""
 	if PROXY != "":
