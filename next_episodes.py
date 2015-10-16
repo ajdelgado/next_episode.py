@@ -28,7 +28,7 @@ TRANSMISSIONSERVER="localhost"
 TRANSMISSIONPORT=9091
 if 'http_proxy' in os.environ.keys():
 	TRANSMISSIONPROXY=os.environ['http_proxy']
-else
+else:
 	TRANSMISSIONPROXY=""
 fi
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
