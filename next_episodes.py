@@ -30,7 +30,6 @@ if 'http_proxy' in os.environ.keys():
 	TRANSMISSIONPROXY=os.environ['http_proxy']
 else:
 	TRANSMISSIONPROXY=""
-fi
 USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
 LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
 EXCEPTIONS=list()
