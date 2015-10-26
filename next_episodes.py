@@ -43,7 +43,7 @@ def Message(TEXT,NIVEL=0):
 		if DEBUG>0:
 			print "Creating folder for log file '%s'" % LOGPATH
 		os.mkdir(LOGPATH,0700)
-	LOGF=open(LOGFILE,"w")
+	LOGF=open(LOGFILE,"a")
 	LOGF.write("%s\n" % TEXT)
 	LOGF.close()
 
