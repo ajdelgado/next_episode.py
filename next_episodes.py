@@ -30,8 +30,8 @@ if 'http_proxy' in os.environ.keys():
 	TRANSMISSIONPROXY=os.environ['http_proxy']
 else:
 	TRANSMISSIONPROXY=""
-USER_AGENT="ultimos_episodios.py/v%s" % (VERSION)
-LOGFILE="%s/log/ultimos_episodios.log" % os.environ['HOME']
+USER_AGENT="next_episodes.py/v%s" % (VERSION)
+LOGFILE="%s/log/next_episodes.log" % os.environ['HOME']
 EXCEPTIONS=list()
 URLBASE="https://kat.ph/usearch"
 def Message(TEXT,NIVEL=0):
