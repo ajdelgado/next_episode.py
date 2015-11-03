@@ -33,7 +33,7 @@ else:
 USER_AGENT="next_episodes.py/v%s" % (VERSION)
 LOGFILE="%s/log/next_episodes.log" % os.environ['HOME']
 EXCEPTIONS=list()
-URLBASE="https://kat.ph/usearch"
+URLBASE="https://kat.cr/usearch"
 def Message(TEXT,NIVEL=0):
 	global DEBUG,LOGFILE
 	if DEBUG >= NIVEL:
