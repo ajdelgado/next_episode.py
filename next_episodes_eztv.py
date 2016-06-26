@@ -383,8 +383,8 @@ def EZTVGetShow(show_name,EZTVSHOWS):
 
 def NextEpisode(last_episode):
 	if last_episode==0:
-		same_season="S01E01"
-		next_season="S01E01"
+		same_season="S00E00"
+		next_season="S00E00"
 	else:
 		season=int(round(last_episode/100))
 		episode=last_episode-(season*100)
@@ -394,7 +394,7 @@ def NextEpisode(last_episode):
 		same_season="S%sE%s" % (sseason.rjust(2,"0"),sepisode.rjust(2,"0"))
 		
 		next_season="%s" % (int(season)+1)
-		next_season="S%sE01" % next_season.rjust(2,"0")
+		next_season="S%sE00" % next_season.rjust(2,"0")
 	return same_season,next_season
 
 def EZTVGetEpisodeByFileName(SHOW,file_name):
@@ -452,7 +452,7 @@ for SHOW in SHOWS_DIRS:
 			if not EZTVEpisode:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
 			if not EZTVEpisode:
-				Message("WWW Not available to download.")
+				Message("III Not available to download.")
 			else:
 				if 'magnet' in EZTVEpisode.keys():
 					EPISODEURL=EZTVEpisode['magnet']
