@@ -48,13 +48,23 @@ def Message(TEXT,NIVEL=0):
 	LOGF.close()
 
 def CheckIfRunning():
-	for process in psutil.get_pid_list():
+	Message("Checking if this task is already running...")
+	try:
+		processes=psutil.get_pid_list()
+	except:
+		processes=psutil.pids()
+	for process in processes:
 		if process != os.getpid():
 			try:
 				ps=psutil.Process(process)
 				try:
 					cmdline=ps.cmdline
-					if len(cmdline)>1:
+					try:
+						len_cmdline=len(ps.cmdline)
+					except:
+						len_cmdline=len(ps.cmdline())
+						cmdline=ps.cmdline()
+					if len_cmdline>1:
 						if cmdline[1] == sys.argv[0]:
 							Message("Already running process %s '%s'" % (process,cmdline))
 							sys.exit(1)
@@ -62,6 +72,7 @@ def CheckIfRunning():
 					Message("I can't read information for process %s" % process)
 			except psutil.NoSuchProcess:
 				Nothing=0
+
 def Usage():
 	global LOGFILE
 	print "-u | --user=<USER>							User name for Transmission remote. Optional."
@@ -125,6 +136,8 @@ def GetArguments():
 		elif o in ("-d", "--debug"):
 			DEBUG=DEBUG + 1
 			Message("Increased debug level to %s" % DEBUG)
+		elif o=="":
+			Message("Remove empty lines from config file")
 		else:
 			assert False, "Unhandled option %s" % o
 def LoadConfigFile(FILE):
@@ -253,11 +266,11 @@ def LastShowEpisode(SHOW):
 	else:
 		Message("III Last episode downloaded from show '%s' was '%s'" % (SHOW,LASTEPISODE))
 	return LASTEPISODE
-def SearchNextEpisode(SHOW,LASTEPISODECOMPLETO):
-	LASTSEASON="%s" % (int(round(LASTEPISODECOMPLETO/100)))
+def SearchNextEpisode(SHOW,LASTEPISODECOMPLETE):
+	LASTSEASON="%s" % (int(round(LASTEPISODECOMPLETE/100)))
 	LASTSEASON=string.rjust(LASTSEASON,2,"0")
 	Message("Last season = %s" % LASTSEASON,3)
-	LASTEPISODE="%s" % int(LASTEPISODECOMPLETO-(int(LASTSEASON)*100))
+	LASTEPISODE="%s" % int(LASTEPISODECOMPLETE-(int(LASTSEASON)*100))
 	LASTEPISODE=string.rjust(LASTEPISODE,2,"0")
 	Message("Last episode = %s" % LASTEPISODE,3)
 	NEXTEPISODE=int(LASTEPISODE)+1
