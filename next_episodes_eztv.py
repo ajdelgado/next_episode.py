@@ -30,9 +30,8 @@ CONFIG['transmission-pass']=""
 CONFIG['transmission-server']="localhost"
 CONFIG['transmission-port']=9091
 CONFIG['transmission-proxy']=""
+CONFIG['exceptions']=list()
 CONFIG['base_url']="https://eztv.ag/showlist/"
-EXCEPTIONS=list()
-CONFIG['exceptions']=EXCEPTIONS
 def CheckIfRunning():
 	Message("Checking if this task is already running...")
 	try:
@@ -62,7 +61,7 @@ def CheckIfRunning():
 
 def Message(TEXT,FORCE=False,LEVEL=0,SYSLOG=False):
 	global CONFIG
-	import syslog
+	import syslog,sys
 	try:
 		TEXT=TEXT.decode("utf8")
 	except:
@@ -84,8 +83,13 @@ def Message(TEXT,FORCE=False,LEVEL=0,SYSLOG=False):
 	if SYSLOG:
 		syslog.syslog(TEXT)
 	#To screen
-	if CONFIG['debug'] > LEVEL or FORCE:
-		print TEXT
+	if int(CONFIG['debug']) > LEVEL or FORCE:
+		if FORCE:
+			sFORCE="True"
+		else:
+			sFORCE="False"
+		#sys.stdout.write("%s (debug=%s force=%s level=%s)\n" % (TEXT,CONFIG['debug'],sFORCE,LEVEL))
+		sys.stdout.write("%s\n" % TEXT)
 def SaveTmpFile(content):
 	global TMPFILE
 	import tempfile
@@ -141,7 +145,7 @@ def GetURLContent(URL):
 	encoded = stream.headers.get('Content-Encoding')
 	server = stream.headers.get('Server')
 	if encoded == 'deflate':
-		Message("Server returned encoded data, trying to deflate it",False,1)
+		Message("Server returned encoded data, trying to deflate it",LEVEL=2)
 		before = len(data)
 		try:
 			data = zlib.decompress(data)
@@ -160,7 +164,7 @@ def GetURLContent(URL):
 		f.close()
 		return data
 	else:
-		Message("Server returned uncompressed data (%s)" % encoded,False,1)
+		Message("Server returned uncompressed data (%s)" % encoded,LEVEL=2)
 		return data
 def GetArguments():
 	global CONFIG
@@ -197,16 +201,17 @@ def ReadConfigFile():
 	for line in f_config:
 		a_line=line.split("=",1)
 		if len(a_line)>1:
-			for k in CONFIG.iterkeys():
-				if a_line[0]==k:
-					CONFIG[k]=a_line[1].replace(chr(13),"").replace(chr(10),"").strip('"')
-					if a_line[0]=="exception":
-						CONFIG['exceptions'].append(CONFIG[k])
-					if a_line[0].find("pass")>-1:
-						val="***"
-					else:
-						val=CONFIG[k]
-					Message("Setting option '%s' as '%s' from config file" % (a_line[0],val))
+			val=a_line[1].replace(chr(13),"").replace(chr(10),"").strip('"')
+			if a_line[0]=="exception":
+				CONFIG['exceptions'].append(val)
+				Message("Adding exception '%s' from config file" % val)
+			else:
+				for k in CONFIG.iterkeys():
+					if a_line[0]==k:
+						CONFIG[k]=val
+						if a_line[0].find("pass")>-1:
+							val="***"
+						Message("Setting option '%s' as '%s' from config file" % (a_line[0],val))
 	f_config.close()
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
@@ -225,7 +230,8 @@ def LastShowEpisode(SHOW):
 	FILES=RecursiveFileListing("%s/%s" % (CONFIG['path'],SHOW))
 	LASTEPISODE=0
 	for FILE in FILES:
-		Message("III Checking file '%s'" % FILE,LEVEL=2)
+		FILE=FILE.replace("//","/")
+		Message("III Checking file '%s'" % FILE,LEVEL=3)
 		EPISODE=0
 		m=re.match(r".*[Ss](?P<SEASON>[0-9]{1,2})[Ee](?P<EPISODE>[0-9]{1,2}).*",FILE)
 		if m != None:
@@ -419,12 +425,14 @@ def AddMagnet(URL):
 
 CheckIfRunning()
 GetArguments()
+print "Debug=%s" % CONFIG['debug']
 EZTVSHOWS=EZTVGetShows()
 SHOWS_DIRS=os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
 	SKIP=False
 	for EXCEPTION in CONFIG['exceptions']:
 		if SHOW == EXCEPTION:
+			Message("III Skipping show '%s' due to exception in configuration." % SHOW,LEVEL=2)
 			SKIP=True
 	if not SKIP:
 		Message("III Checking show '%s'" % SHOW,FORCE=True)
@@ -444,7 +452,7 @@ for SHOW in SHOWS_DIRS:
 			if not EZTVEpisode:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
 			if not EZTVEpisode:
-				Message("WWW Neither episode '%s' or '%s' are available to download yet." % NEXT_EPISODE)
+				Message("WWW Not available to download.")
 			else:
 				if 'magnet' in EZTVEpisode.keys():
 					EPISODEURL=EZTVEpisode['magnet']
