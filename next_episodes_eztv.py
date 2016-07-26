@@ -164,7 +164,7 @@ def GetURLContent(URL):
 		f.close()
 		return data
 	else:
-		Message("Server returned uncompressed data (%s)" % encoded,LEVEL=2)
+		Message("Server returned uncompressed data (encoding is '%s')" % encoded,LEVEL=2)
 		return data
 def GetArguments():
 	global CONFIG
@@ -425,7 +425,7 @@ def AddMagnet(URL):
 
 CheckIfRunning()
 GetArguments()
-print "Debug=%s" % CONFIG['debug']
+print "Arguments processed, debug=%s" % CONFIG['debug']
 EZTVSHOWS=EZTVGetShows()
 SHOWS_DIRS=os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
