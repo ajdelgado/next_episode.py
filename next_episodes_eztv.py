@@ -174,7 +174,6 @@ def GetArguments():
 				CONFIG['debug']=int(CONFIG['debug'])+1
 			else:
 				CONFIG['debug']=CONFIG['debug']+1
-			CONFIG['debug']=CONFIG['debug'] + 1
 			Message("Increased debug level to %s" % CONFIG['debug'])
 		elif arg == "-h" or arg == "--help":
 			Usage()
