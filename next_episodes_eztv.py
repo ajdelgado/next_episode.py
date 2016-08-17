@@ -16,6 +16,7 @@
 ########################################################################
 import sys,os,time,re,urllib2,string,tempfile, gzip
 import psutil
+import requests
 
 CONFIG=dict()
 CONFIG['path']="/home/ficheros/videos/series/"
@@ -103,6 +104,9 @@ def SaveTmpFile(content):
 		TMPFILE.close()
 	return TMPFILENAME
 def GetURLContent(URL):
+	content=requests.get(URL).text
+	return content
+def GetURLContent2(URL):
 	global CONFIG
 	import urllib2,zipfile,socket,httplib,magic,zlib,sys,gc,gzip,tempfile,cookielib
 	gc.collect()
@@ -152,8 +156,8 @@ def GetURLContent(URL):
 		except zlib.error:
 			Message("Error deflating data from '%s'." % URL,True)
 			return ""
-		after = len(data)
-		return after
+		after=len(data)
+		return data
 	elif encoded == 'gzip':
 		o,fn=tempfile.mkstemp()
 		f=open(fn,"w")
