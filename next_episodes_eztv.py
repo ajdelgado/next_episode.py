@@ -386,8 +386,9 @@ def EZTVGetShow(show_name,EZTVSHOWS):
 
 def NextEpisode(last_episode):
 	if last_episode==0:
-		same_season="S00E00"
-		next_season="S00E00"
+		same_season="S00E01"
+		next_season="S00E01"
+		next_season_zero="S00E00"
 	else:
 		season=int(round(last_episode/100))
 		episode=last_episode-(season*100)
@@ -397,8 +398,9 @@ def NextEpisode(last_episode):
 		same_season="S%sE%s" % (sseason.rjust(2,"0"),sepisode.rjust(2,"0"))
 		
 		next_season="%s" % (int(season)+1)
-		next_season="S%sE00" % next_season.rjust(2,"0")
-	return same_season,next_season
+		next_season="S%sE01" % next_season.rjust(2,"0")
+		next_season_zero="S%sE00" % next_season.rjust(2,"0")
+	return same_season,next_season,next_season_zero
 
 def EZTVGetEpisodeByFileName(SHOW,file_name):
 	SHOW_INFO=EZTVGetShowInformation(SHOW)
@@ -448,6 +450,7 @@ for SHOW in SHOWS_DIRS:
 			LAST_EPISODE=LastShowEpisode(SHOW)
 			Message("III Last episode downloaded was %s" % LAST_EPISODE)
 			NEXT_EPISODE=NextEpisode(LAST_EPISODE)
+			#To-Do: Get 3 returned variable with next_season_zero
 			Message("III Next episode to download is %s or %s" % NEXT_EPISODE)
 			EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[0])
 			if 'last_episode' in EZTVSHOW.keys():
