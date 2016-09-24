@@ -400,7 +400,7 @@ def NextEpisode(last_episode):
 		next_season="%s" % (int(season)+1)
 		next_season_zero="S%sE00" % next_season.rjust(2,"0")
 		next_season="S%sE01" % next_season.rjust(2,"0")
-	return same_season,next_season,next_season_zero
+	return same_season,next_season_zero,next_season
 
 def EZTVGetEpisodeByFileName(SHOW,file_name):
 	SHOW_INFO=EZTVGetShowInformation(SHOW)
