@@ -460,7 +460,7 @@ for SHOW in SHOWS_DIRS:
 			if not EZTVEpisode:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[2])
 			if not EZTVEpisode:			
-				Message("III Not available to download.")
+				Message("III No new episode available to download.")
 			else:
 				if 'magnet' in EZTVEpisode.keys():
 					EPISODEURL=EZTVEpisode['magnet']
