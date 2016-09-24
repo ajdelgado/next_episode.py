@@ -451,13 +451,15 @@ for SHOW in SHOWS_DIRS:
 			Message("III Last episode downloaded was %s" % LAST_EPISODE)
 			NEXT_EPISODE=NextEpisode(LAST_EPISODE)
 			#To-Do: Get 3 returned variable with next_season_zero
-			Message("III Next episode to download is %s or %s" % NEXT_EPISODE)
+			Message("III Next episode to download is %s or %s or %s" % NEXT_EPISODE)
 			EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[0])
 			if 'last_episode' in EZTVSHOW.keys():
 				Message("III Last episode in EZTV is '%s'" % EZTVSHOW['last_episode'])
 			if not EZTVEpisode:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
 			if not EZTVEpisode:
+				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[2])
+			if not EZTVEpisode:			
 				Message("III Not available to download.")
 			else:
 				if 'magnet' in EZTVEpisode.keys():
