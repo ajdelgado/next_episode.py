@@ -427,7 +427,7 @@ def AddMagnet(URL):
 	except transmissionrpc.error.TransmissionError,e:
 		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (CONFIG['transmission-user'],CONFIG['transmission-server'],CONFIG['transmission-port'],e))
 	os.environ['http_proxy']=current_proxy
-
+starttime=time.time()
 CheckIfRunning()
 GetArguments()
 print "Arguments processed, debug=%s" % CONFIG['debug']
@@ -470,3 +470,5 @@ for SHOW in SHOWS_DIRS:
 					Message("EEE URL for torrent not found in the episode")
 					Message(EZTVEpisode)
 				AddMagnet(EPISODEURL)
+duration=time.time()-starttime
+Message("III It took %s seconds to process all TV shows" % duration)
