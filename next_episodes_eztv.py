@@ -398,8 +398,8 @@ def NextEpisode(last_episode):
 		same_season="S%sE%s" % (sseason.rjust(2,"0"),sepisode.rjust(2,"0"))
 		
 		next_season="%s" % (int(season)+1)
-		next_season="S%sE01" % next_season.rjust(2,"0")
 		next_season_zero="S%sE00" % next_season.rjust(2,"0")
+		next_season="S%sE01" % next_season.rjust(2,"0")
 	return same_season,next_season,next_season_zero
 
 def EZTVGetEpisodeByFileName(SHOW,file_name):
