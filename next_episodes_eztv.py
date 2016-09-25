@@ -386,9 +386,9 @@ def EZTVGetShow(show_name,EZTVSHOWS):
 
 def NextEpisode(last_episode):
 	if last_episode==0:
-		same_season="S00E01"
-		next_season="S00E01"
-		next_season_zero="S00E00"
+		same_season="S01E01"
+		next_season="S01E01"
+		next_season_zero="S01E00"
 	else:
 		season=int(round(last_episode/100))
 		episode=last_episode-(season*100)
