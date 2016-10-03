@@ -333,7 +333,7 @@ def GetURLContent(URL):
 	if r.status_code == requests.codes.ok:
 		content=r.text
 	else:
-		Message("Returned error %s" & r.status_code)
+		Message("Returned error %s" % r.status_code)
 		content=False
 	return content
 def EpisodioDecimal2Par(EPISODEDECIMAL):
