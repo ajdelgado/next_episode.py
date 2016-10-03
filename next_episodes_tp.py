@@ -334,7 +334,7 @@ def GetURLContent(URL):
 		'http': PROXY,
 		'https': PROXY,
 	}
-	r=requests.get(URL)
+	r=requests.get(URL,proxies=proxies)
 	if r.status_code == requests.codes.ok:
 		content=r.text
 	else:
