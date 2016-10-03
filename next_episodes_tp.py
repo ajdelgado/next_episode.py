@@ -77,8 +77,8 @@ def Usage():
 	global LOGFILE
 	print "-u | --transmission-user=<USER>							User name for Transmission remote. Optional."
 	print "-p | --transmission-pass=<PASSWORD>					Password for Transmission remote. Optional."
-	print "-s | --server=<SERVER>						Server for Transmission remote. Default: localhost."
-	print "-P | --port=<PORT>							Port for Transmission remote. Default: 9091."
+	print "-s | --transmission-server=<SERVER>						Server for Transmission remote. Default: localhost."
+	print "-P | --transmission-port=<PORT>							Port for Transmission remote. Default: 9091."
 	print "-x | --proxy=<PROXY>							Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
 	print "-a | --user-agent=<USER-AGENT-STRING>		User-agent string to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
 	print "-l | --logfile=<LOG FILE>					Log file to record debug information. Default: %s" % LOGFILE
@@ -115,10 +115,10 @@ def GetArguments():
 		elif o in ("-p", "--transmission-pass"):
 			Message("Password for Transmission set.")
 			TRANSMISSIONPASS=a
-		elif o in ("-s", "--server"):
+		elif o in ("-s", "--transmission-server"):
 			Message("Transmission server will be %s." % a)
 			TRANSMISSIONSERVER=a
-		elif o in ("-P", "--port"):
+		elif o in ("-P", "--transmission-port"):
 			Message("Port for Transmission will be %s." % a)
 			TRANSMISSIONPORT=a
 		elif o in ("-x", "--proxy"):
@@ -171,10 +171,10 @@ def LoadConfigFile(FILE):
 			elif o in ("p", "transmission-pass"):
 				Message("Password for Transmission set.")
 				TRANSMISSIONPASS=a
-			elif o in ("s", "server"):
+			elif o in ("s", "transmission-server"):
 				Message("Transmission server will be %s." % a)
 				TRANSMISSIONSERVER=a
-			elif o in ("P", "port"):
+			elif o in ("P", "transmission-port"):
 				Message("Port for Transmission will be %s." % a)
 				TRANSMISSIONPORT=a
 			elif o in ("x", "proxy"):
