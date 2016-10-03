@@ -147,9 +147,9 @@ def LoadConfigFile(FILE):
 		Usage()
 		sys.exit(65)
 	else:
-		config-file=open(FILE,"r")
-		content=config-file.readlines()
-		config-file.close()
+		configfile=open(FILE,"r")
+		content=configfile.readlines()
+		configfile.close()
 		for line in content:
 			lcomment=line.split("#")
 			line=lcomment[0]
