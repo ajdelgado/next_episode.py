@@ -198,9 +198,6 @@ def RecursiveFileListing(PATH):
 	for RAIZ, CARPETAS, SFILES in os.walk(PATH,followlinks=True):
 		for FILE in SFILES:
 			FILES.append(os.path.join(RAIZ,FILE))
-	#for RAIZ, CARPETAS, SFILES in os.walk("/home/ficheros/incoming",followlinks=True):
-		#for FILE in SFILES:
-			#FILES.append(os.path.join(RAIZ,FILE))
 	return FILES
 def CheckTranmission():
 	import transmissionrpc
@@ -349,9 +346,6 @@ def Checks():
 	if not os.path.exists(PATH):
 		Message("Path '%s' doens't exist, exiting." % PATH,1)
 		return False
-	#if not os.path.exists(PATHTORRENTS):
-		#Message("La ruta '%s' no existe, saliendo." % PATHTORRENTS,1)
-		#return False
 	if not CheckTranmission():
 		return False
 	return True
@@ -374,7 +368,6 @@ for SHOW in SHOWS:
 		if CONTENT == False or CONTENT.find("did not match any documents")>-1:
 			Message("III I couldn't find the next episode after '%s'" % LASTEPISODE,2)
 		else:
-			#CONTENT=ExpandGZIP(CONTENT)
 			if len(CONTENT)==0:
 				Message("EEE No data obtained in the search")
 			else:
@@ -383,32 +376,11 @@ for SHOW in SHOWS:
 				TMPFILEH.write(CONTENT)
 				TMPFILEH.close()
 				Message("III Saved as '%s'" % TMPFILE)
-				#m=re.search(r'href="http([][a-zA-Z0-9?=/\.]+\.torrent[][a-zA-Z0-9?=/\.]+)"',CONTENT)
-				#m=re.search(r'href="(http.*\.torrent[][a-zA-Z0-9?=\.]+)',CONTENT)
 				m=re.search(r'href="(magnet:\?[0-9a-zA-Z\&\=\+\%\:\.]*)"',CONTENT)
 				if m != None:
 					TORRENTURL="%s" % m.groups(0)[0]
 					Message("III Found magnet URL '%s'" % TORRENTURL)
-					#CONTENTTORRENT=GetURLContent(TORRENTURL)
 					FNEXTEPISODE="S%sE%s" % (EpisodioDecimal2Par(NEXTEPISODE))
-					#NOMBRETORRENT="%s/%s.%s.torrent" % (PATHTORRENTS,SHOW,FNEXTEPISODE)
-					#if os.path.exists(NOMBRETORRENT):
-						#try:
-							#os.remove(NOMBRETORRENT)
-						#except IOError,e:
-							#Message("EEE Error de entrada y salida eliminando torrent existente '%s'. %s" % (NOMBRETORRENT,e))
-						#except:
-							#Message("EEE Error eliminando torrent existente '%s'" % NOMBRETORRENT)
-					#try:
-						#TORRENT=open("%s" % NOMBRETORRENT,"w")
-						#TORRENT.write(CONTENTTORRENT)
-						#TORRENT.close()
-						#os.chmod("%s" % NOMBRETORRENT,0777)
-						#Message("III Guardado torrent '%s'" % NOMBRETORRENT)
-					#except IOError,e:
-						#Message("EEE Error de entrada y salida guardando torrent '%s'. %s" % (NOMBRETORRENT,e))
-					#except:
-						#Message("EEE Error guardando torrent '%s'" % NOMBRETORRENT)
 					AddMagnet(TORRENTURL)
 				else:
 					Message("EEE I couldn't find any torrent in the search")
