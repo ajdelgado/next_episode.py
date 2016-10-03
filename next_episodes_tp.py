@@ -328,7 +328,12 @@ def SaveTmpFile(content):
 		TMPFILE.close()
 	return TMPFILENAME
 def GetURLContent(URL):
+	global PROXY
 	import requests
+	proxies = {
+		'http': PROXY,
+		'https': PROXY,
+	}
 	r=requests.get(URL)
 	if r.status_code == requests.codes.ok:
 		content=r.text
