@@ -75,14 +75,14 @@ def CheckIfRunning():
 
 def Usage():
 	global LOGFILE
-	print "-u | --user=<USER>							User name for Transmission remote. Optional."
-	print "-p | --password=<PASSWORD>					Password for Transmission remote. Optional."
+	print "-u | --transmission-user=<USER>							User name for Transmission remote. Optional."
+	print "-p | --transmission-password=<PASSWORD>					Password for Transmission remote. Optional."
 	print "-s | --server=<SERVER>						Server for Transmission remote. Default: localhost."
 	print "-P | --port=<PORT>							Port for Transmission remote. Default: 9091."
 	print "-x | --proxy=<PROXY>							Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
 	print "-a | --user-agent=<USER-AGENT-STRING>		User-agent string to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
 	print "-l | --logfile=<LOG FILE>					Log file to record debug information. Default: %s" % LOGFILE
-	print "-c | --configfile=<CONFIG FILE>				Config file with the parameters to use."
+	print "-c | --config-file=<CONFIG FILE>				Config file with the parameters to use."
 	print "-e | --exception=<TV Show folder to ignore>	Config file with the parameters to use."
 	print "-t | --transmission-proxy=<PROXY URL>		Proxy URL to be used by Transmission. Default is the environmental variable http_proxy."
 	print "-d | --debug									Verbose output, repeat it to increase verbosity."
@@ -94,7 +94,7 @@ def GetArguments():
 	import getopt
 	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:e:t:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "configfile=", "exception=","transmission-proxy=","help"])
+		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:e:t:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "config-file=", "exception=","transmission-proxy=","help"])
 	except getopt.GetoptError as err:
 		print str(err)
 		Usage()
@@ -109,10 +109,10 @@ def GetArguments():
 		elif o in ("-l", "--logfile"):
 			Message("Log will be saved in '%s'." % a)
 			LOGFILE=a
-		elif o in ("-u", "--user"):
+		elif o in ("-u", "--transmission-user"):
 			Message("User name for Transmission remote will be %s." % a)
 			TRANSMISSIONUSER=a
-		elif o in ("-p", "--password"):
+		elif o in ("-p", "--transmission-password"):
 			Message("Password for Transmission set.")
 			TRANSMISSIONPASS=a
 		elif o in ("-s", "--server"):
@@ -124,7 +124,7 @@ def GetArguments():
 		elif o in ("-x", "--proxy"):
 			Message("Proxy for HTTP requests will be '%s'." % a)
 			PROXY=a
-		elif o in ("-c", "--configfile"):
+		elif o in ("-c", "--config-file"):
 			Message("Reading config gile '%s'." % a)
 			LoadConfigFile(a)
 		elif o in ("-t", "--transmission-proxy"):
@@ -147,9 +147,9 @@ def LoadConfigFile(FILE):
 		Usage()
 		sys.exit(65)
 	else:
-		configfile=open(FILE,"r")
-		content=configfile.readlines()
-		configfile.close()
+		config-file=open(FILE,"r")
+		content=config-file.readlines()
+		config-file.close()
 		for line in content:
 			lcomment=line.split("#")
 			line=lcomment[0]
@@ -165,10 +165,10 @@ def LoadConfigFile(FILE):
 			elif o in ("l", "logfile"):
 				Message("Log will be saved in '%s'." % a)
 				LOGFILE=a
-			elif o in ("u", "user"):
+			elif o in ("u", "transmission-user"):
 				Message("User name for Transmission remote will be %s." % a)
 				TRANSMISSIONUSER=a
-			elif o in ("p", "password"):
+			elif o in ("p", "transmission-password"):
 				Message("Password for Transmission set.")
 				TRANSMISSIONPASS=a
 			elif o in ("s", "server"):
