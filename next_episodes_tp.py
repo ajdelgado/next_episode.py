@@ -76,7 +76,7 @@ def CheckIfRunning():
 def Usage():
 	global LOGFILE
 	print "-u | --transmission-user=<USER>							User name for Transmission remote. Optional."
-	print "-p | --transmission-password=<PASSWORD>					Password for Transmission remote. Optional."
+	print "-p | --transmission-pass=<PASSWORD>					Password for Transmission remote. Optional."
 	print "-s | --server=<SERVER>						Server for Transmission remote. Default: localhost."
 	print "-P | --port=<PORT>							Port for Transmission remote. Default: 9091."
 	print "-x | --proxy=<PROXY>							Proxy to use for HTTP requests (excluding transmission communications). If not indicated the system variable http_proxy will be used."
@@ -112,7 +112,7 @@ def GetArguments():
 		elif o in ("-u", "--transmission-user"):
 			Message("User name for Transmission remote will be %s." % a)
 			TRANSMISSIONUSER=a
-		elif o in ("-p", "--transmission-password"):
+		elif o in ("-p", "--transmission-pass"):
 			Message("Password for Transmission set.")
 			TRANSMISSIONPASS=a
 		elif o in ("-s", "--server"):
@@ -168,7 +168,7 @@ def LoadConfigFile(FILE):
 			elif o in ("u", "transmission-user"):
 				Message("User name for Transmission remote will be %s." % a)
 				TRANSMISSIONUSER=a
-			elif o in ("p", "transmission-password"):
+			elif o in ("p", "transmission-pass"):
 				Message("Password for Transmission set.")
 				TRANSMISSIONPASS=a
 			elif o in ("s", "server"):
