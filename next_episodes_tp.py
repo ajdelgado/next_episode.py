@@ -86,13 +86,14 @@ def Usage():
 	print "-e | --exception=<TV Show folder to ignore>	Config file with the parameters to use."
 	print "-t | --transmission-proxy=<PROXY URL>		Proxy URL to be used by Transmission. Default is the environmental variable http_proxy."
 	print "-d | --debug									Verbose output, repeat it to increase verbosity."
+	print "-h | --path									Path for the TV shows."
 	print "-h | --help									Show this help."
 	print ""
 	print "Config file syntax"
 	print " The config file use a basic parameter=value syntax. The parameters are the same that you can use in the command line: user,password,server,port,proxy,debug and logfile."
 def GetArguments():
 	import getopt
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY,PATH
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "du:p:s:P:x:a:l:c:e:t:h", ["debug", "user=", "password=", "server=", "port=", "proxy=", "user-agent=", "logfile=", "config-file=", "exception=","transmission-proxy=","help"])
 	except getopt.GetoptError as err:
@@ -136,12 +137,15 @@ def GetArguments():
 		elif o in ("-d", "--debug"):
 			DEBUG=DEBUG + 1
 			Message("Increased debug level to %s" % DEBUG)
+		elif o in ("-d", "--debug"):
+			PATH=a
+			Message("Using path %s" % PATH)
 		elif o=="":
 			Message("Remove empty lines from config file")
 		else:
 			assert False, "Unhandled option %s" % o
 def LoadConfigFile(FILE):
-	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY
+	global DEBUG,TRANSMISSIONUSER,TRANSMISSIONPASS,TRANSMISSIONPORT,TRANSMISSIONSERVER,PROXY,USER_AGENT,LOGFILE,EXCEPTIONS,TRANSMISSIONPROXY,PATH
 	if not os.path.exists(FILE):
 		Message("The config file '%s' doesn't exist" % FILE)
 		Usage()
@@ -174,6 +178,9 @@ def LoadConfigFile(FILE):
 			elif o in ("s", "transmission-server"):
 				Message("Transmission server will be %s." % a)
 				TRANSMISSIONSERVER=a
+			elif o in ("h", "path"):
+				Message("Path for TV shows will be %s." % a)
+				PATH=a
 			elif o in ("P", "transmission-port"):
 				Message("Port for Transmission will be %s." % a)
 				TRANSMISSIONPORT=a
