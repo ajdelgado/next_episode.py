@@ -324,76 +324,9 @@ def SaveTmpFile(content):
 		TMPFILE.close()
 	return TMPFILENAME
 def GetURLContent(URL):
-	global USER_AGENT
-	import gc,random,urllib2,zipfile,socket,httplib,magic,gzip,cookielib
-	gc.collect()
-	try:
-		if 'http_proxy' in os.environ.keys():
-			PROXY=os.environ["http_proxy"]
-		else:
-			PROXY=""
-	except:
-		PROXY=""
-	if PROXY != "":
-		proxy = urllib2.ProxyHandler({'http': os.environ["http_proxy"]})
-		opener = urllib2.build_opener(proxy,urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
-	else:
-		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
-	opener.addheaders = [('User-agent', USER_AGENT)]
-	try:
-		furl=opener.open(URL)
-	except urllib2.URLError, e:
-		Message("Error opening URL '%s'. %s" % (URL,e))
-		return False
-	except urllib2.HTTPError, e:
-		Message("Error opening URL '%s'. %s" % (URL,e))
-		return False
-	except:
-		Message("Unknown error opening URL '%s'" % (URL))
-		return False		
-	try:
-		content=furl.read()
-	except socket.timeout:
-		Message("Error while reading URL '%s'" % (URL))
-		return False
-	except httplib.IncompleteRead:
-		Message("Error while reading URL '%s'" % (URL))
-		return False
-	furl.close()
-	TMPFILEN=SaveTmpFile(content)
-	if zipfile.is_zipfile(TMPFILEN):
-		Message("Content of the URL is a ZipFile")
-		ZFILE=zipfile.ZipFile(TMPFILEN,"r")
-		LZFILES=ZFILE.namelist()
-		for FILE in LZFILES:
-			Message("File in zip: '%s'" % FILE)
-		ZFILE.close()
-		if not cfg['debug']:
-			os.remove(TMPFILEN)
-		return ""
-	else:
-		mag=magic.open(magic.NONE)
-		mag.load()
-		contenttype=mag.buffer(content)
-		if contenttype != None:
-			Message("Downloaded a '%s' file" % contenttype)
-			if contenttype[0:20] == "gzip compressed data":
-				GFILE=gzip.open(TMPFILEN,"r")
-				try:
-					newcontent=GFILE.read()
-				finally:
-					GFILE.close()
-				content=newcontent
-			Message("Obtained %s bytes from '%s'" % (len(content),URL))
-			if DEBUG:
-				SaveTmpFile(content)
-			else:
-				os.remove(TMPFILEN)
-			return content
-		else:
-			if not cfg['debug']:
-				os.remove(TMPFILEN)
-			return False
+	import requests
+	content=requests.get(URL).text
+	return content
 def EpisodioDecimal2Par(EPISODEDECIMAL):
 	DECIMALEPISODENUMBER=int(EPISODEDECIMAL.replace("S","").replace("E",""))
 	SEASON=int(DECIMALEPISODENUMBER)/100

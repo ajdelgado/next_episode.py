@@ -104,6 +104,7 @@ def SaveTmpFile(content):
 		TMPFILE.close()
 	return TMPFILENAME
 def GetURLContent(URL):
+	import requests
 	content=requests.get(URL).text
 	return content
 def GetURLContent2(URL):
