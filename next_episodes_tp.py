@@ -329,7 +329,7 @@ def SaveTmpFile(content):
 	return TMPFILENAME
 def GetURLContent(URL):
 	import requests
-	r=request.get(URL)
+	r=requests.get(URL)
 	if r.status_code == requests.codes.ok:
 		content=r.text
 	else:
