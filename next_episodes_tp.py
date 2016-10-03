@@ -329,7 +329,11 @@ def SaveTmpFile(content):
 	return TMPFILENAME
 def GetURLContent(URL):
 	import requests
-	content=requests.get(URL).text
+	if r.status_code == requests.codes.ok:
+		content=r.text
+	else:
+		Message("Returned error %s" & r.status_code)
+		content=False
 	return content
 def EpisodioDecimal2Par(EPISODEDECIMAL):
 	DECIMALEPISODENUMBER=int(EPISODEDECIMAL.replace("S","").replace("E",""))
