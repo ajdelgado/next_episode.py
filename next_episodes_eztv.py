@@ -107,70 +107,6 @@ def GetURLContent(URL):
 	import requests
 	content=requests.get(URL).text
 	return content
-def GetURLContent2(URL):
-	global CONFIG
-	import urllib2,zipfile,socket,httplib,magic,zlib,sys,gc,gzip,tempfile,cookielib
-	gc.collect()
-	if CONFIG['proxy'] != "":
-		PROXY=CONFIG['proxy']
-	else:
-		try:
-			if 'http_proxy' in os.environ.keys():
-				PROXY=os.environ["http_proxy"]
-			else:
-				PROXY=""
-		except:
-			PROXY=""
-	if PROXY != "":
-		#proxy = urllib2.ProxyHandler({'http': os.environ["http_proxy"]})
-		proxy = urllib2.ProxyHandler({'http': PROXY})
-		opener = urllib2.build_opener(proxy,urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
-	else:
-		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
-	opener.addheaders = [('User-agent', CONFIG['user-agent'])]
-	opener.addheaders = [('Accept-encoding', 'deflate')] 
-
-	try:
-		stream = opener.open(URL,None,10)
-	except urllib2.URLError, e:
-                try:
-                        res=e.code
-                        Message("Error (URL) opening URL '%s'. %s. Code: %s" % (URL,e,e.code))
-                except:
-                        res=e
-                        Message("Error (URL) opening URL '%s'. %s." % (URL,e))
-                return res
-	except urllib2.HTTPError, e:
-		Message("Error (HTTP) opening URL '%s'. %s. Code: %s" % (URL,e,e.code))
-		return e.code
-	except:
-		Message("Unknown error opening URL '%s'" % (URL))
-		return False		
-	data = stream.read()
-	encoded = stream.headers.get('Content-Encoding')
-	server = stream.headers.get('Server')
-	if encoded == 'deflate':
-		Message("Server returned encoded data, trying to deflate it",LEVEL=2)
-		before = len(data)
-		try:
-			data = zlib.decompress(data)
-		except zlib.error:
-			Message("Error deflating data from '%s'." % URL,True)
-			return ""
-		after=len(data)
-		return data
-	elif encoded == 'gzip':
-		o,fn=tempfile.mkstemp()
-		f=open(fn,"w")
-		f.write(data)
-		f.close()
-		f=gzip.open(fn,"r")
-		data=f.read()
-		f.close()
-		return data
-	else:
-		Message("Server returned uncompressed data (encoding is '%s')" % encoded,LEVEL=2)
-		return data
 def GetArguments():
 	global CONFIG
 	for arg in sys.argv:
@@ -266,6 +202,9 @@ def EZTVGetShows():
 	global CONFIG
 	SHOWS=list()
 	SHOWS_CONTENT=GetURLContent(CONFIG['base_url'])
+    if SHOWS_CONTENT == "" or SHOWS_CONTENT === None or SHOWS_CONTENT === False:
+        Message("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['base_url'],FORCE=True)
+        sys.exit(1)
 	SHOWS_SOUP = BeautifulSoup(SHOWS_CONTENT, 'html.parser')
 	for show_a in SHOWS_SOUP.find_all("a",class_="thread_link"):
 		SHOW=dict()
@@ -276,11 +215,11 @@ def EZTVGetShows():
 		list_url=CONFIG['base_url'].split("/")
 		SERVER_URL=list_url[0] + "/" + list_url[1] + "/" + list_url[2]
 		SHOW['href']=SERVER_URL + SHOW['href']
-		
+
 		SHOWS.append(SHOW)
 	return SHOWS
-		
-	
+
+
 def EZTVGetShowInformation(show):
 	import re
 	global CONFIG
@@ -288,13 +227,13 @@ def EZTVGetShowInformation(show):
 	show_info['name']=show['name']
 	show_info['href']=show['href']
 	content=GetURLContent(show['href'])
-	
+
 	#Status
 	#House Status: <b>Ended</b><br/>
 	m=re.search('%s Status: <b>(.*)</b><br/>' % show['name'],content)
 	if m != None:
 		show_info['status']=m.group(1)
-	
+
 	#NextEpisode
 	#Next Episode is <span style="color: #0f559d; font-weight: bold;">Season 6 Episode 10</span> and airs on <b>6/26/2016, 09:00 PM</b>.
 	m=re.search('Next Episode is <span style="color: #0f559d; font-weight: bold;">Season ([0-9]*) Episode ([0-9]*)</span> and airs on.',content)
@@ -302,10 +241,10 @@ def EZTVGetShowInformation(show):
 		season=m.group(1)
 		episode=m.group(2)
 		show_info['next_episode']=(season,episode)
-	
+
 	show_info['episodes']=EZTVGetShowEpisodes(show,content)
 	show_info['last_episode']=EZTVLastEpisode(show_info)
-	
+
 	return show_info
 def EZTVLastEpisode(show):
 	import re
@@ -320,7 +259,7 @@ def EZTVLastEpisode(show):
 					last = episode_num
 					last_epi=episode
 	return last,last_epi
-	
+
 def EZTVSeachShowURL(SHOW,SHOWS_CONTENT):
 	global CONFIG
 	SHOW=SHOW.lower()
@@ -393,11 +332,11 @@ def NextEpisode(last_episode):
 	else:
 		season=int(round(last_episode/100))
 		episode=last_episode-(season*100)
-		
+
 		sseason="%s" % season
 		sepisode="%s" % (episode+1)
 		same_season="S%sE%s" % (sseason.rjust(2,"0"),sepisode.rjust(2,"0"))
-		
+
 		next_season="%s" % (int(season)+1)
 		next_season_zero="S%sE00" % next_season.rjust(2,"0")
 		next_season="S%sE01" % next_season.rjust(2,"0")
@@ -460,7 +399,7 @@ for SHOW in SHOWS_DIRS:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
 			if not EZTVEpisode:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[2])
-			if not EZTVEpisode:			
+			if not EZTVEpisode:
 				Message("III No new episode available to download.")
 			else:
 				if 'magnet' in EZTVEpisode.keys():
