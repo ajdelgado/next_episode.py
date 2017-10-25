@@ -202,9 +202,9 @@ def EZTVGetShows():
 	global CONFIG
 	SHOWS=list()
 	SHOWS_CONTENT=GetURLContent(CONFIG['base_url'])
-    if SHOWS_CONTENT == "" or SHOWS_CONTENT === None or SHOWS_CONTENT === False:
-        Message("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['base_url'],FORCE=True)
-        sys.exit(1)
+	if SHOWS_CONTENT == "" or SHOWS_CONTENT is None or SHOWS_CONTENT is False:
+		Message("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['base_url'],FORCE=True)
+		sys.exit(1)
 	SHOWS_SOUP = BeautifulSoup(SHOWS_CONTENT, 'html.parser')
 	for show_a in SHOWS_SOUP.find_all("a",class_="thread_link"):
 		SHOW=dict()
