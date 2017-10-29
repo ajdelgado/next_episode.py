@@ -353,8 +353,8 @@ def EZTVGetEpisodeByFileName(SHOW,file_name):
 def AddMagnet(URL):
 	import transmissionrpc
 	global CONFIG
-    if URL is False:
-        return False
+	if URL is False:
+		return False
 	if 'http_proxy' in os.environ.keys():
 		current_proxy=os.environ['http_proxy']
 	else:
