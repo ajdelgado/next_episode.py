@@ -411,7 +411,7 @@ for SHOW in SHOWS_DIRS:
 				else:
 					Message("EEE URL for torrent not found in the episode:%s" % EZTVEpisode,FORCE=True)
 					Message(EZTVEpisode)
-                    EPISODEURL=False
+					EPISODEURL=False
 				AddMagnet(EPISODEURL)
 duration=time.time()-starttime
 Message("III It took %s seconds to process all TV shows" % duration)
