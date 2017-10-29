@@ -353,6 +353,8 @@ def EZTVGetEpisodeByFileName(SHOW,file_name):
 def AddMagnet(URL):
 	import transmissionrpc
 	global CONFIG
+    if URL is False:
+        return False
 	if 'http_proxy' in os.environ.keys():
 		current_proxy=os.environ['http_proxy']
 	else:
@@ -374,12 +376,12 @@ print "Arguments processed, debug=%s" % CONFIG['debug']
 EZTVSHOWS=EZTVGetShows()
 SHOWS_DIRS=os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
-	SKIP=False
+	SKIPTHIS=False
 	for EXCEPTION in CONFIG['exceptions']:
 		if SHOW == EXCEPTION:
 			Message("III Skipping show '%s' due to exception in configuration." % SHOW,LEVEL=2)
-			SKIP=True
-	if not SKIP:
+			SKIPTHIS=True
+	if not SKIPTHIS:
 		Message("III Checking show '%s'" % SHOW,FORCE=True)
 		EZTVSHOW=EZTVGetShow(SHOW,EZTVSHOWS)
 		if not EZTVSHOW:
@@ -407,8 +409,9 @@ for SHOW in SHOWS_DIRS:
 				elif 'torrent_url' in EZTVEpisode.keys():
 					EPISODEURL=EZTVEpisode['torrent_url']
 				else:
-					Message("EEE URL for torrent not found in the episode")
+					Message("EEE URL for torrent not found in the episode:%s" % EZTVEpisode,FORCE=True)
 					Message(EZTVEpisode)
+                    EPISODEURL=False
 				AddMagnet(EPISODEURL)
 duration=time.time()-starttime
 Message("III It took %s seconds to process all TV shows" % duration)
