@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 ########################################################################
@@ -14,7 +14,7 @@
 ##
 ##
 ########################################################################
-import sys,os,time,re,urllib.request,urllib.error,urllib.parse,string,tempfile, gzip
+import sys,os,time,re,urllib2,string,tempfile, gzip
 import psutil
 import requests
 import logging
@@ -37,7 +37,7 @@ CONFIG['transmission-proxy']=""
 CONFIG['exceptions']=list()
 CONFIG['base_url']="https://eztv.ag/showlist/"
 def CheckIfRunning():
-	log.info("Checking if this task is already running...")
+	Message("Checking if this task is already running...")
 	try:
 		processes=psutil.get_pid_list()
 	except:
@@ -55,20 +55,51 @@ def CheckIfRunning():
 						cmdline=ps.cmdline()
 					if len_cmdline>1:
 						if cmdline[1] == sys.argv[0]:
-							Messalog.infoge("Already running process %s '%s'" % (process,cmdline))
+							Message("Already running process %s '%s'" % (process,cmdline))
 							sys.exit(1)
 				except psutil.AccessDenied:
-					log.info("I can't read information for process %s" % process)
+					Message("I can't read information for process %s" % process)
 			except psutil.NoSuchProcess:
 				Nothing=0
 
 
+def Message(TEXT,FORCE=False,LEVEL=0,SYSLOG=False):
+	global CONFIG
+	import syslog,sys
+	try:
+		TEXT=TEXT.decode("utf8")
+	except:
+		try:
+			TEXT=TEXT.encode("ascii", 'replace')
+		except:
+			TEXT=TEXT
+	#To a log file
+	#if not os.path.exists(os.path.dirname(CONFIG['logfile'])):
+		#os.mkdir(os.path.dirname(CONFIG['logfile']))
+	#logf=open(CONFIG['logfile'],"a")
+	#try:
+		#logf.write(TEXT)
+	#except:
+		#TEXT=TEXT.encode("utf8")
+		#logf.write(TEXT)
+	#logf.close()
+	#To syslog
+	if SYSLOG:
+		syslog.syslog(TEXT)
+	#To screen
+	if int(CONFIG['debug']) > LEVEL or FORCE:
+		if FORCE:
+			sFORCE="True"
+		else:
+			sFORCE="False"
+		#sys.stdout.write("%s (debug=%s force=%s level=%s)\n" % (TEXT,CONFIG['debug'],sFORCE,LEVEL))
+		sys.stdout.write("%s\n" % TEXT)
 def SaveTmpFile(content):
 	global TMPFILE
 	import tempfile
 	TMPFILEO=tempfile.mkstemp(prefix='tmp_', dir="/tmp/")
 	TMPFILENAME=TMPFILEO[1]
-	log.info("Saving temporarily to '%s' (don't forget to remove it)" % (TMPFILENAME))
+	Message("Saving temporarily to '%s' (don't forget to remove it)" % (TMPFILENAME))
 	TMPFILE=open(TMPFILENAME,"w")
 	try:
 		TMPFILE.write(content)
@@ -76,6 +107,7 @@ def SaveTmpFile(content):
 		TMPFILE.close()
 	return TMPFILENAME
 def GetURLContent(URL):
+	import requests
 	content=requests.get(URL).text
 	return content
 def GetArguments():
@@ -86,27 +118,27 @@ def GetArguments():
 				CONFIG['debug']=int(CONFIG['debug'])+1
 			else:
 				CONFIG['debug']=CONFIG['debug']+1
-			log.info("Increased debug level to %s" % CONFIG['debug'])
+			Message("Increased debug level to %s" % CONFIG['debug'])
 		elif arg == "-h" or arg == "--help":
 			Usage()
 		elif arg.find("=")>-1:
 			aarg=arg.split("=",1)
 			if aarg[0]=="--exception":
 				CONFIG['exceptions'].append(aarg[1])
-				log.info("Added exception '%s'" % aarg[1])
+				Message("Added exception '%s'" % aarg[1])
 			elif aarg[0]=="--config-file":
 				CONFIG['config-file']=aarg[1]
-				log.info("Will read config file '%s' (after processing command line arguments)" % aarg[1])
+				Message("Will read config file '%s' (after processing command line arguments)" % aarg[1])
 			elif aarg[0]=="--proxy":
 				CONFIG['proxy']=aarg[1]
-				log.info("Will use proxy '%s'" % CONFIG['proxy'])
+				Message("Will use proxy '%s'" % CONFIG['proxy'])
 		if CONFIG['config-file']!="":
 			ReadConfigFile()
 def ReadConfigFile():
 	global CONFIG
 	import os
 	if not os.path.exists(CONFIG['config-file']):
-		log.info("The configuration file '%s' doesn't exist" % CONFIG['config-file'])
+		Message("The configuration file '%s' doesn't exist" % CONFIG['config-file'])
 		return False
 	f_config=open(CONFIG['config-file'],"r")
 	for line in f_config:
@@ -115,14 +147,14 @@ def ReadConfigFile():
 			val=a_line[1].replace(chr(13),"").replace(chr(10),"").strip('"')
 			if a_line[0]=="exception":
 				CONFIG['exceptions'].append(val)
-				log.info("Adding exception '%s' from config file" % val)
+				Message("Adding exception '%s' from config file" % val)
 			else:
-				for k in CONFIG.keys():
+				for k in CONFIG.iterkeys():
 					if a_line[0]==k:
 						CONFIG[k]=val
 						if a_line[0].find("pass")>-1:
 							val="***"
-						log.info("Setting option '%s' as '%s' from config file" % (a_line[0],val))
+						Message("Setting option '%s' as '%s' from config file" % (a_line[0],val))
 	f_config.close()
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
@@ -174,7 +206,7 @@ def EZTVGetShows():
 	SHOWS=list()
 	SHOWS_CONTENT=GetURLContent(CONFIG['base_url'])
 	if SHOWS_CONTENT == "" or SHOWS_CONTENT is None or SHOWS_CONTENT is False:
-		log.info("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['base_url'],FORCE=True)
+		Message("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['base_url'],FORCE=True)
 		sys.exit(1)
 	SHOWS_SOUP = BeautifulSoup(SHOWS_CONTENT, 'html.parser')
 	for show_a in SHOWS_SOUP.find_all("a",class_="thread_link"):
@@ -244,7 +276,7 @@ def EZTVSeachShowURL(SHOW,SHOWS_CONTENT):
 		SHOW_URL=SERVER_URL + m.group(1)
 		return SHOW_URL
 	else:
-		log.info("'%s' not found in base url" % SHOW,FORCE=True)
+		Message("'%s' not found in base url" % SHOW,FORCE=True)
 		return False
 def EZTVGetShowEpisodes(show,content):
 	from bs4 import BeautifulSoup
@@ -315,7 +347,7 @@ def NextEpisode(last_episode):
 
 def EZTVGetEpisodeByFileName(SHOW,file_name):
 	SHOW_INFO=EZTVGetShowInformation(SHOW)
-	if "episodes" in list(SHOW_INFO.keys()):
+	if "episodes" in SHOW_INFO.keys():
 		for episode in SHOW_INFO['episodes']:
 			#print episode['file_name']
 			if episode['file_name'].find(file_name)>-1:
@@ -326,7 +358,7 @@ def AddMagnet(URL):
 	global CONFIG
 	if URL is False:
 		return False
-	if 'http_proxy' in list(os.environ.keys()):
+	if 'http_proxy' in os.environ.keys():
 		current_proxy=os.environ['http_proxy']
 	else:
 		current_proxy=""
@@ -336,9 +368,9 @@ def AddMagnet(URL):
 		try:
 			conn.add_torrent(URL)
 		except:
-			log.info("Error adding torrent URL '%s' to Transmission" % URL)
-	except transmissionrpc.error.TransmissionError as e:
-		log.info("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (CONFIG['transmission-user'],CONFIG['transmission-server'],CONFIG['transmission-port'],e))
+			Message("Error adding torrent URL '%s' to Transmission" % URL)
+	except transmissionrpc.error.TransmissionError,e:
+		Message("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (CONFIG['transmission-user'],CONFIG['transmission-server'],CONFIG['transmission-port'],e))
 	os.environ['http_proxy']=current_proxy
 starttime=time.time()
 
@@ -367,7 +399,7 @@ for SHOW in SHOWS_DIRS:
 		log.info("Checking show '%s'" % SHOW)
 		EZTVSHOW=EZTVGetShow(SHOW,EZTVSHOWS)
 		if not EZTVSHOW:
-			log.warn("WWW NOT found '%s' in EZTV" % SHOW)
+			Message("WWW NOT found '%s' in EZTV" % SHOW)
 		else:
 			log.info("FOUND in '%s' in EZTV as '%s'" % (SHOW,EZTVSHOW['name']))
 			show_info=EZTVGetShowInformation(EZTVSHOW)
@@ -377,7 +409,7 @@ for SHOW in SHOWS_DIRS:
 			#To-Do: Get 3 returned variable with next_season_zero
 			log.info("Next episode to download is %s or %s or %s" % NEXT_EPISODE)
 			EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[0])
-			if 'last_episode' in list(EZTVSHOW.keys()):
+			if 'last_episode' in EZTVSHOW.keys():
 				log.info("Last episode in EZTV is '%s'" % EZTVSHOW['last_episode'])
 			if not EZTVEpisode:
 				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
@@ -386,13 +418,13 @@ for SHOW in SHOWS_DIRS:
 			if not EZTVEpisode:
 				log.info("No new episode available to download.")
 			else:
-				if 'magnet' in list(EZTVEpisode.keys()):
+				if 'magnet' in EZTVEpisode.keys():
 					EPISODEURL=EZTVEpisode['magnet']
-				elif 'torrent_url' in list(EZTVEpisode.keys()):
+				elif 'torrent_url' in EZTVEpisode.keys():
 					EPISODEURL=EZTVEpisode['torrent_url']
 				else:
 					log.error("URL for torrent not found in the episode:%s" % EZTVEpisode)
-					log.info(EZTVEpisode)
+					Message(EZTVEpisode)
 					EPISODEURL=False
 				AddMagnet(EPISODEURL)
 duration=time.time()-starttime
