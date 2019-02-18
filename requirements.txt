@@ -1,5 +1,4 @@
 psutil
 requests
-syslog
 bs4
 transmissionrpc

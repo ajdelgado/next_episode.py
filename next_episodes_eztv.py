@@ -24,10 +24,9 @@ from logging.handlers import RotatingFileHandler
 CONFIG=dict()
 CONFIG['path']="/home/ficheros/videos/series/"
 CONFIG['config-file']=""
-CONFIG['syslog']=True
 CONFIG['user-agent']="Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/20100101 Firefox/5.0"
-CONFIG['debug']=0
 CONFIG['proxy']=""
+CONFIG['debug']=False
 CONFIG['logfile']=os.environ['HOME'] + "/log/next_episodes_2.log"
 CONFIG['transmission-user']="admin"
 CONFIG['transmission-pass']=""
@@ -35,7 +34,7 @@ CONFIG['transmission-server']="localhost"
 CONFIG['transmission-port']=9091
 CONFIG['transmission-proxy']=""
 CONFIG['exceptions']=list()
-CONFIG['base_url']="https://eztv.ag/showlist/"
+CONFIG['base_url']="https://eztv.io/showlist/"
 def CheckIfRunning():
 	log.info("Checking if this task is already running...")
 	try:
@@ -82,11 +81,8 @@ def GetArguments():
 	global CONFIG
 	for arg in sys.argv:
 		if arg == "-v" or arg == "-d" or arg == "--verbose" or arg == "--debug":
-			if isinstance( CONFIG['debug'], str):
-				CONFIG['debug']=int(CONFIG['debug'])+1
-			else:
-				CONFIG['debug']=CONFIG['debug']+1
-			log.info("Increased debug level to %s" % CONFIG['debug'])
+			CONFIG['debug'] = True
+			log.info("Enable debug level")
 		elif arg == "-h" or arg == "--help":
 			Usage()
 		elif arg.find("=")>-1:
@@ -100,6 +96,10 @@ def GetArguments():
 			elif aarg[0]=="--proxy":
 				CONFIG['proxy']=aarg[1]
 				log.info("Will use proxy '%s'" % CONFIG['proxy'])
+			else:
+				parameter = aarg[0].replace("--","")
+				CONFIG[parameter] = aarg[1]
+				log.info('Parameter "{}" set to "{}"'.format(parameter, CONFIG[parameter]))
 		if CONFIG['config-file']!="":
 			ReadConfigFile()
 def ReadConfigFile():
@@ -142,7 +142,7 @@ def LastShowEpisode(SHOW):
 	LASTEPISODE=0
 	for FILE in FILES:
 		FILE=FILE.replace("//","/")
-		log.info("Checking file '%s'" % FILE,LEVEL=3)
+		log.debug("Checking file '%s'" % FILE)
 		EPISODE=0
 		m=re.match(r".*[Ss](?P<SEASON>[0-9]{1,2})[Ee](?P<EPISODE>[0-9]{1,2}).*",FILE)
 		if m != None:
@@ -206,8 +206,7 @@ def EZTVGetShowInformation(show):
 		show_info['status']=m.group(1)
 
 	#NextEpisode
-	#Next Episode is <span style="color: #0f559d; font-weight: bold;">Season 6 Episode 10</span> and airs on <b>6/26/2016, 09:00 PM</b>.
-	m=re.search('Next Episode is <span style="color: #0f559d; font-weight: bold;">Season ([0-9]*) Episode ([0-9]*)</span> and airs on.',content)
+		m=re.search('Next Episode is <span style="color: #0f559d; font-weight: bold;">Season ([0-9]*) Episode ([0-9]*)</span> and airs on.',content)
 	if m != None:
 		season=m.group(1)
 		episode=m.group(2)
@@ -226,7 +225,7 @@ def EZTVLastEpisode(show):
 			m=re.search("(S[0-9]*E[0-9]*)",episode['file_name'])
 			if m != None:
 				episode_num=m.group(1).replace("S","").replace("E","")
-				if episode_num > last:
+				if int(episode_num) > int(last):
 					last = episode_num
 					last_epi=episode
 	return last,last_epi
@@ -257,12 +256,10 @@ def EZTVGetShowEpisodes(show,content):
 		if len(cols)>4:
 			#file name
 			episode['file_name']=cols[1].a.text
-			#print episode['file_name']
 			#magnet
 			magnet_soup=cols[2].find(class_="magnet")
 			if magnet_soup != None:
 				episode['magnet']=magnet_soup['href']
-				#print episode['magnet']
 			else:
 				downloads=cols[2].find_all(class_=re.compile("download_"))
 				for download in downloads:
@@ -289,10 +286,6 @@ def EZTVGetShow(show_name,EZTVSHOWS):
 		simply_eztv_name=SimplifyShowName(eztv_show['name'])
 		if simply_show_name == simply_eztv_name:
 			return eztv_show
-		#else:
-			#if len(simply_eztv_name)>1:
-				#if simply_show_name[0] == simply_eztv_name[0] and simply_show_name[1] == simply_eztv_name[1]:
-					#print simply_show_name + "<>" + simply_eztv_name
 	return False
 
 def NextEpisode(last_episode):
@@ -332,29 +325,50 @@ def AddMagnet(URL):
 		current_proxy=""
 	os.environ['http_proxy']=CONFIG['transmission-proxy']
 	try:
-		conn=transmissionrpc.Client(CONFIG['transmission-server'], user=CONFIG['transmission-user'],password=CONFIG['transmission-pass'],port=CONFIG['transmission-port'])
+		conn=transmissionrpc.Client(CONFIG['transmission-server'],
+									user=CONFIG['transmission-user'],
+									password=CONFIG['transmission-pass'],
+									port=CONFIG['transmission-port'])
 		try:
 			conn.add_torrent(URL)
 		except:
 			log.info("Error adding torrent URL '%s' to Transmission" % URL)
 	except transmissionrpc.error.TransmissionError as e:
-		log.info("Error adding torrent to Transmission. User=%s, Password=***, Server=%s, Port=%s. %s" % (CONFIG['transmission-user'],CONFIG['transmission-server'],CONFIG['transmission-port'],e))
+		log.info("Error adding torrent to Transmission. "
+				 "User=%s, Password=***, Server=%s, "
+				 "Port=%s. %s" % (CONFIG['transmission-user'],
+				 				  CONFIG['transmission-server'],
+								   CONFIG['transmission-port'],
+								   e))
 	os.environ['http_proxy']=current_proxy
 starttime=time.time()
-
 log = logging.getLogger()
-log.addHandler(SysLogHandler())
-handler = RotatingFileHandler('{}/log/next_episodes.log'.format(os.environ['HOME']),
+log.setLevel(logging.getLevelName('DEBUG'))
+
+sysloghandler = SysLogHandler()
+sysloghandler.setLevel(logging.getLevelName('DEBUG'))
+log.addHandler(sysloghandler)
+
+streamhandler = logging.StreamHandler(sys.stdout)
+streamhandler.setLevel(logging.getLevelName('DEBUG'))
+log.addHandler(streamhandler)
+
+GetArguments()
+if CONFIG['debug']:
+	log.setLevel(logging.getLevelName('DEBUG'))
+else:
+	log.setLevel(logging.getLevelName('WARNING'))
+if not os.path.exists(os.path.dirname(CONFIG['logfile'])):
+	os.mkdir(os.path.dirname(CONFIG['logfile']))
+filehandler = RotatingFileHandler(CONFIG['logfile'],
 							  maxBytes=1000000,
 							  backupCount=5)
 formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
-handler.setFormatter(formatter)
-log.addHandler(handler)
-log.setLevel(logging.DEBUG)
+filehandler.setFormatter(formatter)
+filehandler.setLevel(logging.getLevelName('DEBUG'))
+log.addHandler(filehandler)
 
 CheckIfRunning()
-GetArguments()
-log.info("Arguments processed, debug=%s" % CONFIG['debug'])
 EZTVSHOWS=EZTVGetShows()
 SHOWS_DIRS=os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
@@ -367,7 +381,7 @@ for SHOW in SHOWS_DIRS:
 		log.info("Checking show '%s'" % SHOW)
 		EZTVSHOW=EZTVGetShow(SHOW,EZTVSHOWS)
 		if not EZTVSHOW:
-			log.warn("WWW NOT found '%s' in EZTV" % SHOW)
+			log.warn("NOT found '%s' in EZTV" % SHOW)
 		else:
 			log.info("FOUND in '%s' in EZTV as '%s'" % (SHOW,EZTVSHOW['name']))
 			show_info=EZTVGetShowInformation(EZTVSHOW)
