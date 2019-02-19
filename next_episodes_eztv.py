@@ -255,7 +255,7 @@ streamhandler.setLevel(logging.getLevelName('DEBUG'))
 log.addHandler(streamhandler)
 
 parser = argparse.ArgumentParser(description='Find next episodes for a given path containing TV shows in separate folders.')
-parser.add_argument('--debug', dest='debug', default=False,
+parser.add_argument('--debug', dest='debug',
                     help='Turn on debug information')
 parser.add_argument('--path', dest='path', default='/home/ficheros/videos/series',
                     help='Path to TV shows')
