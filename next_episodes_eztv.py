@@ -14,7 +14,10 @@
 ##
 ##
 ########################################################################
-import sys,os,time,re,urllib.request,urllib.error,urllib.parse,string,tempfile, gzip
+import sys 
+import os
+import time
+import re
 import psutil
 import requests
 import logging
@@ -22,7 +25,6 @@ from logging.handlers import SysLogHandler
 from logging.handlers import RotatingFileHandler
 import json
 import argparse
-import pprint
 
 def CheckIfRunning():
 	log.info("Checking if this task is already running...")
@@ -282,11 +284,9 @@ parser.add_argument('--exception', dest='exceptions', action='append',
                     help='TV shows (folder name) to ignore')
 args = parser.parse_args()
 CONFIG=vars(args)
-pprint.pprint(CONFIG)
 if CONFIG['configfile'] is not None:
 	CONFIGFILE = json.load(open(CONFIG['configfile'],'r'))
 	CONFIG = {**CONFIG, **CONFIGFILE}
-	pprint.pprint(CONFIG)
 
 log.setLevel(logging.getLevelName(CONFIG['debug']))
 if not os.path.exists(os.path.dirname(CONFIG['logfile'])):
