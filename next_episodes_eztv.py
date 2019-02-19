@@ -50,21 +50,6 @@ def CheckIfRunning():
 				Nothing=0
 
 
-def SaveTmpFile(content):
-	global TMPFILE
-	import tempfile
-	TMPFILEO=tempfile.mkstemp(prefix='tmp_', dir="/tmp/")
-	TMPFILENAME=TMPFILEO[1]
-	log.info("Saving temporarily to '%s' (don't forget to remove it)" % (TMPFILENAME))
-	TMPFILE=open(TMPFILENAME,"w")
-	try:
-		TMPFILE.write(content)
-	finally:
-		TMPFILE.close()
-	return TMPFILENAME
-def GetURLContent(URL):
-	content=requests.get(URL).text
-	return content
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
 		return False
@@ -72,9 +57,6 @@ def RecursiveFileListing(PATH):
 	for RAIZ, CARPETAS, SFILES in os.walk(PATH,followlinks=True):
 		for FILE in SFILES:
 			FILES.append(os.path.join(RAIZ,FILE))
-	#for RAIZ, CARPETAS, SFILES in os.walk("/home/ficheros/incoming",followlinks=True):
-		#for FILE in SFILES:
-			#FILES.append(os.path.join(RAIZ,FILE))
 	return FILES
 
 def LastShowEpisode(SHOW):
@@ -107,9 +89,9 @@ def EZTVGetShows():
 	from bs4 import BeautifulSoup
 	global CONFIG
 	SHOWS=list()
-	SHOWS_CONTENT=GetURLContent(CONFIG['base_url'])
+	SHOWS_CONTENT=requests.get(CONFIG['baseurl'], headers=reqheaders, proxies=proxies).text
 	if SHOWS_CONTENT == "" or SHOWS_CONTENT is None or SHOWS_CONTENT is False:
-		log.info("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['base_url'],FORCE=True)
+		log.info("Nothing obtained from the base url '%s'. There is no Internet connection or the URL is broken?" % CONFIG['baseurl'],FORCE=True)
 		sys.exit(1)
 	SHOWS_SOUP = BeautifulSoup(SHOWS_CONTENT, 'html.parser')
 	for show_a in SHOWS_SOUP.find_all("a",class_="thread_link"):
@@ -117,7 +99,7 @@ def EZTVGetShows():
 		SHOW['href']=show_a['href']
 		SHOW['name']=show_a.text.strip(" ")
 
-		list_url=CONFIG['base_url'].split("/")
+		list_url=CONFIG['baseurl'].split("/")
 		SERVER_URL=list_url[0] + "/" + list_url[1] + "/" + list_url[2]
 		SHOW['href']=SERVER_URL + SHOW['href']
 
@@ -131,7 +113,7 @@ def EZTVGetShowInformation(show):
 	show_info=dict()
 	show_info['name']=show['name']
 	show_info['href']=show['href']
-	content=GetURLContent(show['href'])
+	content=requests.get(show['href'], headers=reqheaders, proxies=proxies).text
 
 	#Status
 	#House Status: <b>Ended</b><br/>
@@ -171,7 +153,7 @@ def EZTVSeachShowURL(SHOW,SHOWS_CONTENT):
 	if SHOW != SHOW2:
 		SHOW=SHOW2 + ", the"
 	m=re.search('<a href="([a-z0-9A-Z\/\-]*)" class="thread_link">%s</a></td>' % SHOW,SHOWS_CONTENT.lower())
-	list_url=CONFIG['base_url'].split("/")
+	list_url=CONFIG['baseurl'].split("/")
 	SERVER_URL=list_url[0] + "/" + list_url[1] + "/" + list_url[2]
 	if m != None:
 		SHOW_URL=SERVER_URL + m.group(1)
@@ -332,6 +314,11 @@ filehandler.setLevel(logging.getLevelName('DEBUG'))
 log.addHandler(filehandler)
 
 CheckIfRunning()
+reqheaders = { 'User-Agent': CONFIG['useragent']}
+proxies = {'http': CONFIG['proxy'],
+	     'https': CONFIG['proxy'],
+		 'ftp': CONFIG['proxy'],
+}
 EZTVSHOWS=EZTVGetShows()
 SHOWS_DIRS=os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
