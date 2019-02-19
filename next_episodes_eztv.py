@@ -287,6 +287,8 @@ def AddMagnet(URL):
                                   CONFIG['transmissionport'],
                                   e))
     os.environ['http_proxy'] = current_proxy
+
+
 starttime = time.time()
 log = logging.getLogger()
 log.setLevel(logging.getLevelName('DEBUG'))
