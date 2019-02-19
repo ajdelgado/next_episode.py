@@ -285,6 +285,7 @@ CONFIG=vars(args)
 pprint.pprint(CONFIG)
 if CONFIG['configfile'] is not None:
 	CONFIG = json.load(open(CONFIG['configfile'],'r'))
+	pprint.pprint(CONFIG)
 
 log.setLevel(logging.getLevelName(CONFIG['debug']))
 if not os.path.exists(os.path.dirname(CONFIG['logfile'])):
