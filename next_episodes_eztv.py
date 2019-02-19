@@ -103,12 +103,6 @@ def LastShowEpisode(SHOW):
 	else:
 		log.info("Last episode downloaded from show '%s' was '%s'" % (SHOW,LASTEPISODE))
 	return LASTEPISODE
-def re_replace(string,pattern,replacement):
-	import re
-	m=re.search(pattern,string)
-	if m != None:
-		string=string.replace(m.group(1),replacement)
-	return string
 def EZTVGetShows():
 	from bs4 import BeautifulSoup
 	global CONFIG
@@ -121,7 +115,6 @@ def EZTVGetShows():
 	for show_a in SHOWS_SOUP.find_all("a",class_="thread_link"):
 		SHOW=dict()
 		SHOW['href']=show_a['href']
-		#SHOW['name']=re_replace(show_a.text,"( \(20[0-9]{2}\))","").strip(" ")
 		SHOW['name']=show_a.text.strip(" ")
 
 		list_url=CONFIG['base_url'].split("/")
@@ -174,7 +167,7 @@ def EZTVLastEpisode(show):
 def EZTVSeachShowURL(SHOW,SHOWS_CONTENT):
 	global CONFIG
 	SHOW=SHOW.lower()
-	SHOW2=re_replace(SHOW,"^(the\.)","")
+	SHOW2=re.sub("^(the\.)","", SHOW)
 	if SHOW != SHOW2:
 		SHOW=SHOW2 + ", the"
 	m=re.search('<a href="([a-z0-9A-Z\/\-]*)" class="thread_link">%s</a></td>' % SHOW,SHOWS_CONTENT.lower())
@@ -215,9 +208,9 @@ def EZTVGetShowEpisodes(show,content):
 	return episodes
 def SimplifyShowName(show_name):
 	new_name=show_name.lower().replace("."," ").replace("'","").replace("  "," ").replace("(","").replace(")","").strip(" ").replace(":","").replace("!","")
-	new_name=re_replace(new_name,"( 20[0-9][0-9]),","")
-	new_name=re_replace(new_name,"( 20[0-9][0-9])$","")
-	new_name2=re_replace(new_name,"^(the )","")
+	new_name=re.sub("( 20[0-9][0-9]),","", new_name)
+	new_name=re.sub("( 20[0-9][0-9])$","", new_name)
+	new_name2=re.sub("^(the )","", new_name)
 	if new_name2 != new_name:
 		new_name=new_name2 + ", the"
 	return new_name
@@ -264,12 +257,12 @@ def AddMagnet(URL):
 		current_proxy=os.environ['http_proxy']
 	else:
 		current_proxy=""
-	os.environ['http_proxy']=CONFIG['transmission-proxy']
+	os.environ['http_proxy']=CONFIG['transmissionproxy']
 	try:
-		conn=transmissionrpc.Client(CONFIG['transmission-server'],
-									user=CONFIG['transmission-user'],
-									password=CONFIG['transmission-pass'],
-									port=CONFIG['transmission-port'])
+		conn=transmissionrpc.Client(CONFIG['transmissionserver'],
+									user=CONFIG['transmissionuser'],
+									password=CONFIG['transmissionpass'],
+									port=CONFIG['transmissionport'])
 		try:
 			conn.add_torrent(URL)
 		except:
@@ -277,9 +270,9 @@ def AddMagnet(URL):
 	except transmissionrpc.error.TransmissionError as e:
 		log.info("Error adding torrent to Transmission. "
 				 "User=%s, Password=***, Server=%s, "
-				 "Port=%s. %s" % (CONFIG['transmission-user'],
-				 				  CONFIG['transmission-server'],
-								   CONFIG['transmission-port'],
+				 "Port=%s. %s" % (CONFIG['transmissionuser'],
+				 				  CONFIG['transmissionserver'],
+								   CONFIG['transmissionport'],
 								   e))
 	os.environ['http_proxy']=current_proxy
 starttime=time.time()
@@ -321,8 +314,8 @@ parser.add_argument('--exception', dest='exceptions', action='append',
                     help='TV shows (folder name) to ignore')
 args = parser.parse_args()
 CONFIG=vars(args)
-if CONFIG['config-file']!="":
-	CONFIG = json.load(CONFIG['config-file'])
+if CONFIG['configfile']!="":
+	CONFIG = json.load(CONFIG['configfile'])
 
 if CONFIG['debug']:
 	log.setLevel(logging.getLevelName('DEBUG'))
