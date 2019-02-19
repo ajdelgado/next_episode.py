@@ -22,6 +22,7 @@ from logging.handlers import SysLogHandler
 from logging.handlers import RotatingFileHandler
 import json
 import argparse
+import pprint
 
 def CheckIfRunning():
 	log.info("Checking if this task is already running...")
@@ -281,6 +282,7 @@ parser.add_argument('--exception', dest='exceptions', action='append',
                     help='TV shows (folder name) to ignore')
 args = parser.parse_args()
 CONFIG=vars(args)
+pprint.pprint(CONFIG)
 if CONFIG['configfile'] is not None:
 	CONFIG = json.load(open(CONFIG['configfile'],'r'))
 
