@@ -21,21 +21,8 @@ import logging
 from logging.handlers import SysLogHandler
 from logging.handlers import RotatingFileHandler
 import json
+import argparse
 
-CONFIG=dict()
-CONFIG['path']="/home/ficheros/videos/series/"
-CONFIG['config-file']=""
-CONFIG['user-agent']="Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/20100101 Firefox/5.0"
-CONFIG['proxy']=""
-CONFIG['debug']=False
-CONFIG['logfile']=os.environ['HOME'] + "/log/next_episodes_2.log"
-CONFIG['transmission-user']="admin"
-CONFIG['transmission-pass']=""
-CONFIG['transmission-server']="localhost"
-CONFIG['transmission-port']=9091
-CONFIG['transmission-proxy']=""
-CONFIG['exceptions']=list()
-CONFIG['base_url']="https://eztv.io/showlist/"
 def CheckIfRunning():
 	log.info("Checking if this task is already running...")
 	try:
@@ -78,31 +65,6 @@ def SaveTmpFile(content):
 def GetURLContent(URL):
 	content=requests.get(URL).text
 	return content
-def GetArguments():
-	global CONFIG
-	for arg in sys.argv:
-		if arg == "-v" or arg == "-d" or arg == "--verbose" or arg == "--debug":
-			CONFIG['debug'] = True
-			log.info("Enable debug level")
-		elif arg == "-h" or arg == "--help":
-			Usage()
-		elif arg.find("=")>-1:
-			aarg=arg.split("=",1)
-			if aarg[0]=="--exception":
-				CONFIG['exceptions'].append(aarg[1])
-				log.info("Added exception '%s'" % aarg[1])
-			elif aarg[0]=="--config-file":
-				CONFIG['config-file']=aarg[1]
-				log.info("Will read config file '%s' (after processing command line arguments)" % aarg[1])
-			elif aarg[0]=="--proxy":
-				CONFIG['proxy']=aarg[1]
-				log.info("Will use proxy '%s'" % CONFIG['proxy'])
-			else:
-				parameter = aarg[0].replace("--","")
-				CONFIG[parameter] = aarg[1]
-				log.info('Parameter "{}" set to "{}"'.format(parameter, CONFIG[parameter]))
-		if CONFIG['config-file']!="":
-			CONFIG = json.load(CONFIG['config-file'])
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
 		return False
@@ -332,7 +294,36 @@ streamhandler = logging.StreamHandler(sys.stdout)
 streamhandler.setLevel(logging.getLevelName('DEBUG'))
 log.addHandler(streamhandler)
 
-GetArguments()
+parser = argparse.ArgumentParser(description='Find next episodes for a given path containing TV shows in separate folders.')
+parser.add_argument('--debug', dest='debug', default=False,
+                    help='Turn on debug information')
+parser.add_argument('--path', dest='path', default='/home/ficheros/videos/series',
+                    help='Path to TV shows')
+parser.add_argument('--configfile', dest='configfile',
+                    help='Config file to overwrite parameters in the command line')
+parser.add_argument('--proxy', dest='proxy',
+                    help='Proxy string to use (http://127.0.0.1:8080/)')
+parser.add_argument('--logfile', dest='logfile', default="{}/log/next_episodes_2.log".format(os.environ['HOME']),
+                    help='Log file to write output')
+parser.add_argument('--useragent', dest='useragent', default="Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/20100101 Firefox/5.0",
+                    help='User-agent string to use to identify')
+parser.add_argument('--transmissionuser', dest='transmissionuser', default="admin",
+                    help='User name to authenticate with Transmission')
+parser.add_argument('--transmissionpass', dest='transmissionpass', default="",
+                    help='Password to authenticate with Transmission')
+parser.add_argument('--transmissionserver', dest='transmissionserver', default="localhost",
+                    help='Transmission server to connect')
+parser.add_argument('--transmissionport', dest='transmissionport', default="9091",
+                    help='Transmission server port to connect')
+parser.add_argument('--baseurl', dest='baseurl', default="https://eztv.io/showlist/",
+                    help='Base URL to find the TV shows')
+parser.add_argument('--exception', dest='exceptions', action='append',
+                    help='TV shows (folder name) to ignore')
+args = parser.parse_args()
+CONFIG=vars(args)
+if CONFIG['config-file']!="":
+	CONFIG = json.load(CONFIG['config-file'])
+
 if CONFIG['debug']:
 	log.setLevel(logging.getLevelName('DEBUG'))
 else:
