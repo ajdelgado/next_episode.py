@@ -284,7 +284,8 @@ args = parser.parse_args()
 CONFIG=vars(args)
 pprint.pprint(CONFIG)
 if CONFIG['configfile'] is not None:
-	CONFIG = json.load(open(CONFIG['configfile'],'r'))
+	CONFIGFILE = json.load(open(CONFIG['configfile'],'r'))
+	CONFIG = {**CONFIG, **CONFIGFILE}
 	pprint.pprint(CONFIG)
 
 log.setLevel(logging.getLevelName(CONFIG['debug']))
