@@ -281,7 +281,7 @@ parser.add_argument('--exception', dest='exceptions', action='append',
                     help='TV shows (folder name) to ignore')
 args = parser.parse_args()
 CONFIG=vars(args)
-if CONFIG['configfile']!="":
+if CONFIG['configfile'] is not None:
 	CONFIG = json.load(CONFIG['configfile'])
 
 if CONFIG['debug']:
