@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 ########################################################################
-##
-## next_episodes_2.py
-## Antonio J. Delgado 2016
-##
-## Description: Locate next episodes of TV shows in a given path
-##
+#
+# next_episodes_2.py
+# Antonio J. Delgado 2016
+#
+# Description: Locate next episodes of TV shows in a given path
+#
 ########################################################################
-##
-## To-Do:
-##
-##
+#
+# To-Do:
+#
+#  Check if the episode is 1080p
+#
 ########################################################################
 import sys
 import os
