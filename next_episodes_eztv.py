@@ -282,7 +282,7 @@ parser.add_argument('--exception', dest='exceptions', action='append',
 args = parser.parse_args()
 CONFIG=vars(args)
 if CONFIG['configfile'] is not None:
-	CONFIG = json.load(CONFIG['configfile'])
+	CONFIG = json.load(open(CONFIG['configfile'],'r'))
 
 if CONFIG['debug']:
 	log.setLevel(logging.getLevelName('DEBUG'))
