@@ -255,7 +255,7 @@ streamhandler.setLevel(logging.getLevelName('DEBUG'))
 log.addHandler(streamhandler)
 
 parser = argparse.ArgumentParser(description='Find next episodes for a given path containing TV shows in separate folders.')
-parser.add_argument('--debug', dest='debug',
+parser.add_argument('--debug', dest='debug', default='WARNING',
                     help='Set debug level (CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET)')
 parser.add_argument('--path', dest='path', default='/home/ficheros/videos/series',
                     help='Path to TV shows')
@@ -284,10 +284,7 @@ CONFIG=vars(args)
 if CONFIG['configfile'] is not None:
 	CONFIG = json.load(open(CONFIG['configfile'],'r'))
 
-if 'debug' in CONFIG.keys():
-	log.setLevel(logging.getLevelName('DEBUG'))
-else:
-	log.setLevel(logging.getLevelName('WARNING'))
+log.setLevel(logging.getLevelName(CONFIG['debug']))
 if not os.path.exists(os.path.dirname(CONFIG['logfile'])):
 	os.mkdir(os.path.dirname(CONFIG['logfile']))
 filehandler = RotatingFileHandler(CONFIG['logfile'],
