@@ -20,6 +20,7 @@ import requests
 import logging
 from logging.handlers import SysLogHandler
 from logging.handlers import RotatingFileHandler
+import json
 
 CONFIG=dict()
 CONFIG['path']="/home/ficheros/videos/series/"
@@ -101,29 +102,7 @@ def GetArguments():
 				CONFIG[parameter] = aarg[1]
 				log.info('Parameter "{}" set to "{}"'.format(parameter, CONFIG[parameter]))
 		if CONFIG['config-file']!="":
-			ReadConfigFile()
-def ReadConfigFile():
-	global CONFIG
-	import os
-	if not os.path.exists(CONFIG['config-file']):
-		log.info("The configuration file '%s' doesn't exist" % CONFIG['config-file'])
-		return False
-	f_config=open(CONFIG['config-file'],"r")
-	for line in f_config:
-		a_line=line.split("=",1)
-		if len(a_line)>1:
-			val=a_line[1].replace(chr(13),"").replace(chr(10),"").strip('"')
-			if a_line[0]=="exception":
-				CONFIG['exceptions'].append(val)
-				log.info("Adding exception '%s' from config file" % val)
-			else:
-				for k in CONFIG.keys():
-					if a_line[0]==k:
-						CONFIG[k]=val
-						if a_line[0].find("pass")>-1:
-							val="***"
-						log.info("Setting option '%s' as '%s' from config file" % (a_line[0],val))
-	f_config.close()
+			CONFIG = json.load(CONFIG['config-file'])
 def RecursiveFileListing(PATH):
 	if os.path.exists(PATH) == False:
 		return False
