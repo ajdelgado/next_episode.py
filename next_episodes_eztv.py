@@ -59,7 +59,7 @@ def RecursiveFileListing(PATH):
 			FILES.append(os.path.join(RAIZ,FILE))
 	return FILES
 
-def LastShowEpisode(SHOW):
+def GetLastShowEpisode(SHOW):
 	global CONFIG
 	FILES=RecursiveFileListing("%s/%s" % (CONFIG['path'],SHOW))
 	LASTEPISODE=0
@@ -85,7 +85,7 @@ def LastShowEpisode(SHOW):
 	else:
 		log.info("Last episode downloaded from show '%s' was '%s'" % (SHOW,LASTEPISODE))
 	return LASTEPISODE
-def EZTVGetShows():
+def GetEZTVShows():
 	from bs4 import BeautifulSoup
 	global CONFIG
 	SHOWS=list()
@@ -107,7 +107,7 @@ def EZTVGetShows():
 	return SHOWS
 
 
-def EZTVGetShowInformation(show):
+def GetEZTVShowInformation(show):
 	import re
 	global CONFIG
 	show_info=dict()
@@ -128,11 +128,11 @@ def EZTVGetShowInformation(show):
 		episode=m.group(2)
 		show_info['next_episode']=(season,episode)
 
-	show_info['episodes']=EZTVGetShowEpisodes(show,content)
-	show_info['last_episode']=EZTVLastEpisode(show_info)
+	show_info['episodes']=GetEZTVShowEpisodes(show,content)
+	show_info['last_episode']=GetEZTVLastEpisode(show_info)
 
 	return show_info
-def EZTVLastEpisode(show):
+def GetEZTVLastEpisode(show):
 	import re
 	last=0
 	last_epi=None
@@ -146,22 +146,7 @@ def EZTVLastEpisode(show):
 					last_epi=episode
 	return last,last_epi
 
-def EZTVSeachShowURL(SHOW,SHOWS_CONTENT):
-	global CONFIG
-	SHOW=SHOW.lower()
-	SHOW2=re.sub("^(the\.)","", SHOW)
-	if SHOW != SHOW2:
-		SHOW=SHOW2 + ", the"
-	m=re.search('<a href="([a-z0-9A-Z\/\-]*)" class="thread_link">%s</a></td>' % SHOW,SHOWS_CONTENT.lower())
-	list_url=CONFIG['baseurl'].split("/")
-	SERVER_URL=list_url[0] + "/" + list_url[1] + "/" + list_url[2]
-	if m != None:
-		SHOW_URL=SERVER_URL + m.group(1)
-		return SHOW_URL
-	else:
-		log.info("'%s' not found in base url" % SHOW,FORCE=True)
-		return False
-def EZTVGetShowEpisodes(show,content):
+def GetEZTVShowEpisodes(show,content):
 	from bs4 import BeautifulSoup
 	episodes=list()
 	soup=BeautifulSoup(content, 'html.parser')
@@ -196,7 +181,7 @@ def SimplifyShowName(show_name):
 	if new_name2 != new_name:
 		new_name=new_name2 + ", the"
 	return new_name
-def EZTVGetShow(show_name,EZTVSHOWS):
+def GetEZTVShow(show_name,EZTVSHOWS):
 	for eztv_show in EZTVSHOWS:
 		simply_show_name=SimplifyShowName(show_name)
 		simply_eztv_name=SimplifyShowName(eztv_show['name'])
@@ -204,7 +189,7 @@ def EZTVGetShow(show_name,EZTVSHOWS):
 			return eztv_show
 	return False
 
-def NextEpisode(last_episode):
+def FindNextEpisode(last_episode):
 	if last_episode==0:
 		same_season="S01E01"
 		next_season="S01E01"
@@ -222,8 +207,8 @@ def NextEpisode(last_episode):
 		next_season="S%sE01" % next_season.rjust(2,"0")
 	return same_season,next_season_zero,next_season
 
-def EZTVGetEpisodeByFileName(SHOW,file_name):
-	SHOW_INFO=EZTVGetShowInformation(SHOW)
+def GetEZTVEpisodeByFileName(SHOW,file_name):
+	SHOW_INFO=GetEZTVShowInformation(SHOW)
 	if "episodes" in list(SHOW_INFO.keys()):
 		for episode in SHOW_INFO['episodes']:
 			#print episode['file_name']
@@ -319,7 +304,7 @@ proxies = {'http': CONFIG['proxy'],
 	     'https': CONFIG['proxy'],
 		 'ftp': CONFIG['proxy'],
 }
-EZTVSHOWS=EZTVGetShows()
+EZTVSHOWS=GetEZTVShows()
 SHOWS_DIRS=os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
 	SKIPTHIS=False
@@ -329,24 +314,24 @@ for SHOW in SHOWS_DIRS:
 			SKIPTHIS=True
 	if not SKIPTHIS:
 		log.info("Checking show '%s'" % SHOW)
-		EZTVSHOW=EZTVGetShow(SHOW,EZTVSHOWS)
+		EZTVSHOW=GetEZTVShow(SHOW,EZTVSHOWS)
 		if not EZTVSHOW:
 			log.warn("NOT found '%s' in EZTV" % SHOW)
 		else:
 			log.info("FOUND in '%s' in EZTV as '%s'" % (SHOW,EZTVSHOW['name']))
-			show_info=EZTVGetShowInformation(EZTVSHOW)
-			LAST_EPISODE=LastShowEpisode(SHOW)
+			show_info=GetEZTVShowInformation(EZTVSHOW)
+			LAST_EPISODE=GetLastShowEpisode(SHOW)
 			log.info("Last episode downloaded was %s" % LAST_EPISODE)
-			NEXT_EPISODE=NextEpisode(LAST_EPISODE)
+			NEXT_EPISODE=FindNextEpisode(LAST_EPISODE)
 			#To-Do: Get 3 returned variable with next_season_zero
 			log.info("Next episode to download is %s or %s or %s" % NEXT_EPISODE)
-			EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[0])
+			EZTVEpisode=GetEZTVEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[0])
 			if 'last_episode' in list(EZTVSHOW.keys()):
 				log.info("Last episode in EZTV is '%s'" % EZTVSHOW['last_episode'])
 			if not EZTVEpisode:
-				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
+				EZTVEpisode=GetEZTVEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[1])
 			if not EZTVEpisode:
-				EZTVEpisode=EZTVGetEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[2])
+				EZTVEpisode=GetEZTVEpisodeByFileName(EZTVSHOW,NEXT_EPISODE[2])
 			if not EZTVEpisode:
 				log.info("No new episode available to download.")
 			else:
