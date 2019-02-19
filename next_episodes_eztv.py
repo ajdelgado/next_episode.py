@@ -284,7 +284,7 @@ CONFIG=vars(args)
 if CONFIG['configfile'] is not None:
 	CONFIG = json.load(open(CONFIG['configfile'],'r'))
 
-if CONFIG['debug']:
+if 'debug' in CONFIG.keys():
 	log.setLevel(logging.getLevelName('DEBUG'))
 else:
 	log.setLevel(logging.getLevelName('WARNING'))
