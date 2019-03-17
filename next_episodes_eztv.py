@@ -103,9 +103,7 @@ def GetEZTVShows():
     from bs4 import BeautifulSoup
     global CONFIG
     SHOWS = list()
-    SHOWS_CONTENT = requests.get(CONFIG['baseurl'],
-                                 headers=reqheaders,
-                                 proxies=proxies).text
+    SHOWS_CONTENT = session.get(CONFIG['baseurl']).text
     if SHOWS_CONTENT == "" or SHOWS_CONTENT is None or SHOWS_CONTENT is False:
         log.info("Nothing obtained from the base url '%s'. There "
                  "is no Internet connection or the URL is broken?"
@@ -131,9 +129,7 @@ def GetEZTVShowInformation(show):
     show_info = dict()
     show_info['name'] = show['name']
     show_info['href'] = show['href']
-    content = requests.get(show['href'],
-                           headers=reqheaders,
-                           proxies=proxies).text
+    content = session.get(show['href']).text
 
     # Status
     # House Status: <b>Ended</b><br/>
@@ -363,6 +359,7 @@ proxies = {'http': CONFIG['proxy'],
            'https': CONFIG['proxy'],
            'ftp': CONFIG['proxy']
            }
+session = requests.Session(proxies=proxies, headers=reqheaders)
 EZTVSHOWS = GetEZTVShows()
 SHOWS_DIRS = os.listdir(CONFIG['path'])
 for SHOW in SHOWS_DIRS:
