@@ -359,16 +359,23 @@ proxies = {'http': CONFIG['proxy'],
            'https': CONFIG['proxy'],
            'ftp': CONFIG['proxy']
            }
-session = requests.Session(proxies=proxies, headers=reqheaders)
+session = requests.Session()
+session.proxies = proxies
+session.headers = reqheaders
 EZTVSHOWS = GetEZTVShows()
-SHOWS_DIRS = os.listdir(CONFIG['path'])
+try:
+    SHOWS_DIRS = os.listdir(CONFIG['path'])
+except FileNotFoundError:
+    log.error("The path for video '{}' can't be found.".format(CONFIG['path']))
+    sys.exit(65)
 for SHOW in SHOWS_DIRS:
     SKIPTHIS = False
-    for EXCEPTION in CONFIG['exceptions']:
-        if SHOW == EXCEPTION:
-            log.info("Skipping show '%s' due to exception "
-                     "in configuration." % SHOW)
-            SKIPTHIS = True
+    if CONFIG['exceptions']:
+        for EXCEPTION in CONFIG['exceptions']:
+            if SHOW == EXCEPTION:
+                log.info("Skipping show '%s' due to exception "
+                         "in configuration." % SHOW)
+                SKIPTHIS = True
     if not SKIPTHIS:
         log.info("Checking show '%s'" % SHOW)
         EZTVSHOW = GetEZTVShow(SHOW, EZTVSHOWS)
