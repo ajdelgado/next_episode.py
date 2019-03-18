@@ -308,7 +308,7 @@ parser.add_argument('--path', dest='path',
                     help='Path to TV shows')
 parser.add_argument('--configfile', dest='configfile',
                     help='Config file to overwrite parameters '
-                    'in the command line')
+                    'from the command line')
 parser.add_argument('--proxy', dest='proxy',
                     help='Proxy string to use (http://127.0.0.1:8080/)')
 parser.add_argument('--logfile', dest='logfile',
