@@ -247,12 +247,19 @@ def FindNextEpisode(last_episode):
 
 def GetEZTVEpisodeByFileName(SHOW, file_name):
     SHOW_INFO = GetEZTVShowInformation(SHOW)
+    option2 = ""
     if "episodes" in list(SHOW_INFO.keys()):
         for episode in SHOW_INFO['episodes']:
             log.debug("Checking episode '%s'..." % episode['file_name'])
             if episode['file_name'].find(file_name) > -1:
-                return episode
-    return False
+                if episode['file_name'].find(' 720p ') > -1:
+                    return episode
+                else:
+                    option2 = episode
+    if option2 != "":
+        return option2
+    else:
+        return False
 
 
 def AddMagnet(URL):
