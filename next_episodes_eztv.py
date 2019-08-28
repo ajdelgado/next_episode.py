@@ -70,6 +70,9 @@ def RecursiveFileListing(PATH):
 def GetLastShowEpisode(SHOW):
     global CONFIG
     FILES = RecursiveFileListing("%s/%s" % (CONFIG['path'], SHOW))
+    if not FILES:
+        log.error("No files found in '%s/%s' getting last show episode." % (CONFIG['path'], SHOW))
+        return False
     LASTEPISODE = 0
     for FILE in FILES:
         FILE = FILE.replace("//", "/")
