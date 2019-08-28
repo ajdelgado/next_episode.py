@@ -249,6 +249,7 @@ def GetEZTVEpisodeByFileName(SHOW, file_name):
     SHOW_INFO = GetEZTVShowInformation(SHOW)
     if "episodes" in list(SHOW_INFO.keys()):
         for episode in SHOW_INFO['episodes']:
+            log.debug("Checking episode '%s'..." % episode['file_name'])
             if episode['file_name'].find(file_name) > -1:
                 return episode
     return False
