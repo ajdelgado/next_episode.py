@@ -5,3 +5,4 @@ Usage: Create the folder in the PATH variable, inside create a folder for each T
 Requirements: urllib2, gzip, psutil, transmissionrpc, threading, socket, httplib, magic, gzip, cookielib, BeautifulSoup
 ## To-do:
 - Check that the episode is 1080p
+Main (latest) code in https://repos.susurrando.com/adelgado/next_episode.py
